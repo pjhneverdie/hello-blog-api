@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
+### Application properties 외부에서 관리
 application.properties
