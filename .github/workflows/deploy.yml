@@ -58,3 +58,5 @@ jobs:
             nohup java -jar project.jar > ./output.log 2>&1 &
             rm -rf /home/ubuntu/hello-blog-api-dev-server/tobe
             
+            
+            
