@@ -29,7 +29,8 @@ dependencies {
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
-	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-core:10.15.0'
+	implementation 'org.flywaydb:flyway-mysql:10.15.0'
 }
 
 tasks.named('test') {
