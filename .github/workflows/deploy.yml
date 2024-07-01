@@ -19,7 +19,9 @@ jobs:
           java-version: 17
 
       - name: application.properties 추가하기
-        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
 
       - name: 테스트 및 빌드하기
         run: ./gradlew clean build
