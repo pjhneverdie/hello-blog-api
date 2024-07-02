@@ -80,8 +80,14 @@ jobs:
       - name: sshpass 설치하기
         run: sudo apt-get install -y sshpass
 
+      - name: 맥북에 연결 테스트
+        run: |
+          echo "맥북에 SSH 연결을 테스트합니다..."
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} "echo 연결 성공"
+
       - name: 소스코드를 맥북으로 전송하기
         run: |
+          echo "소스 코드를 맥북으로 전송합니다..."
           sshpass -p "${{ secrets.MAC_PASSWORD }}" scp -o StrictHostKeyChecking=no -r . ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }}:/Users/${{ secrets.MAC_USERNAME }}/build-temp
 
       - name: 맥북에서 테스트 및 빌드하기
@@ -109,9 +115,8 @@ jobs:
 
       - name: 맥북의 임시 폴더 삭제하기
         run: |
-          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
-            rm -rf ~/build-temp
-          EOF
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC
+
 
 
 
