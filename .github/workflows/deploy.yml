@@ -1,3 +1,62 @@
+#name: Deploy To EC2
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#jobs:
+#  Deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: 깃허브 레포지토리 불러오기
+#        uses: actions/checkout@v4
+#
+#      - name: JDK 17 설치하기
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: corretto
+#          java-version: 17
+#
+#      - name: application.properties 추가하기
+#        run: |
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+#
+#      - name: 테스트 및 빌드하기
+#        run: ./gradlew clean build
+#
+#      - name: 빌드된 파일 이름 변경하기
+#        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
+#
+#      - name: SCP로 EC2에 빌드된 파일 전송하기
+#        uses: appleboy/scp-action@v0.1.7
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          source: project.jar
+#          target: /home/ubuntu/hello-blog-api-dev-server/tobe
+#
+#      - name: SSH로 EC2에 접속하기
+#        uses: appleboy/ssh-action@v1.0.3
+#        env:
+#          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_PRIVATE_KEY }}
+#          source: project.jar
+#          target: /home/ubuntu/hello-blog-api-dev-server/tobe
+#          script_stop: true
+#          script: |
+#            rm -rf /home/ubuntu/hello-blog-api-dev-server/current
+#            mkdir /home/ubuntu/hello-blog-api-dev-server/current
+#            mv /home/ubuntu/hello-blog-api-dev-server/tobe/project.jar /home/ubuntu/hello-blog-api-dev-server/current/project.jar
+#            cd /home/ubuntu/hello-blog-api-dev-server/current
+#            sudo fuser -k -n tcp 8080 || true
+#            nohup java -jar project.jar > ./output.log 2>&1 &
+#            rm -rf /home/ubuntu/hello-blog-api-dev-server/tobe
 name: Deploy To EC2
 
 on:
@@ -12,48 +71,39 @@ jobs:
       - name: 깃허브 레포지토리 불러오기
         uses: actions/checkout@v4
 
-      - name: JDK 17 설치하기
-        uses: actions/setup-java@v4
-        with:
-          distribution: corretto
-          java-version: 17
-
-      - name: application.properties 추가하기
+      - name: Setup SSH to MacBook
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          MAC_HOST: ${{ secrets.MAC_HOST }}
+          MAC_USERNAME: ${{ secrets.MAC_USERNAME }}
         run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $MAC_HOST >> ~/.ssh/known_hosts
 
-      - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
-
-      - name: 빌드된 파일 이름 변경하기
-        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
-
-      - name: SCP로 EC2에 빌드된 파일 전송하기
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: project.jar
-          target: /home/ubuntu/hello-blog-api-dev-server/tobe
-
-      - name: SSH로 EC2에 접속하기
-        uses: appleboy/ssh-action@v1.0.3
+      - name: SSH to MacBook and build project
         env:
           APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: project.jar
-          target: /home/ubuntu/hello-blog-api-dev-server/tobe
-          script_stop: true
-          script: |
-            rm -rf /home/ubuntu/hello-blog-api-dev-server/current
-            mkdir /home/ubuntu/hello-blog-api-dev-server/current
-            mv /home/ubuntu/hello-blog-api-dev-server/tobe/project.jar /home/ubuntu/hello-blog-api-dev-server/current/project.jar
-            cd /home/ubuntu/hello-blog-api-dev-server/current
-            sudo fuser -k -n tcp 8080 || true
-            nohup java -jar project.jar > ./output.log 2>&1 &
-            rm -rf /home/ubuntu/hello-blog-api-dev-server/tobe
+        run: |
+          ssh -i ~/.ssh/id_rsa $MAC_USERNAME@$MAC_HOST << 'EOF'
+            cd /Users/$MAC_USERNAME/Coding/Spring/Project/hello-blog/origin/hello-blog-api
+            git pull origin main
+            echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+            ./gradlew clean build
+            mv ./build/libs/*SNAPSHOT.jar ./project.jar
+
+            # SCP로 EC2에 빌드된 파일 전송하기
+            scp -i ~/.ssh/id_rsa ./project.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/ubuntu/hello-blog-api-dev-server/tobe
+
+            # SSH로 EC2에 접속하여 배포하기
+            ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOSSH'
+              rm -rf /home/ubuntu/hello-blog-api-dev-server/current
+              mkdir /home/ubuntu/hello-blog-api-dev-server/current
+              mv /home/ubuntu/hello-blog-api-dev-server/tobe/project.jar /home/ubuntu/hello-blog-api-dev-server/current/project.jar
+              cd /home/ubuntu/hello-blog-api-dev-server/current
+              sudo fuser -k -n tcp 8080 || true
+              nohup java -jar project.jar > ./output.log 2>&1 &
+              rm -rf /home/ubuntu/hello-blog-api-dev-server/tobe
+            EOSSH
+          EOF
