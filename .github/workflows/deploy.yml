@@ -78,6 +78,7 @@ jobs:
           MAC_USERNAME: ${{ secrets.MAC_USERNAME }}
         run: |
           ssh $MAC_USERNAME@$MAC_HOST
+          yes
 
 #      - name: SSH to MacBook and build project
 #        env:
