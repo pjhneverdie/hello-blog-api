@@ -77,13 +77,16 @@ jobs:
           mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
 
+      - name: sshpass 설치하기
+        run: sudo apt-get install -y sshpass
+
       - name: 소스코드를 맥북으로 전송하기
         run: |
-          scp -o StrictHostKeyChecking=no -r . ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }}:/Users/${{ secrets.MAC_USERNAME }}/build-temp
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" scp -o StrictHostKeyChecking=no -r . ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }}:/Users/${{ secrets.MAC_USERNAME }}/build-temp
 
       - name: 맥북에서 테스트 및 빌드하기
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
             cd ~/build-temp
             ./gradlew clean build
             mv ./build/libs/*SNAPSHOT.jar ~/built_project.jar
@@ -91,9 +94,9 @@ jobs:
 
       - name: 맥북에서 EC2로 빌드된 파일 전송 및 배포하기
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
-            scp -o StrictHostKeyChecking=no ~/built_project.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/ubuntu/hello-blog-api-dev-server/tobe/built_project.jar
-            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << EEC2
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
+            sshpass -p "${{ secrets.EC2_PASSWORD }}" scp -o StrictHostKeyChecking=no ~/built_project.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/ubuntu/hello-blog-api-dev-server/tobe/built_project.jar
+            sshpass -p "${{ secrets.EC2_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << EEC2
               rm -rf /home/ubuntu/hello-blog-api-dev-server/current
               mkdir /home/ubuntu/hello-blog-api-dev-server/current
               mv /home/ubuntu/hello-blog-api-dev-server/tobe/built_project.jar /home/ubuntu/hello-blog-api-dev-server/current/built_project.jar
@@ -106,9 +109,10 @@ jobs:
 
       - name: 맥북의 임시 폴더 삭제하기
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
             rm -rf ~/build-temp
           EOF
+
 
 
 
