@@ -115,7 +115,10 @@ jobs:
 
       - name: 맥북의 임시 폴더 삭제하기
         run: |
-          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC
+          sshpass -p "${{ secrets.MAC_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.MAC_USERNAME }}@${{ secrets.MAC_HOST }} << EOF
+            rm -rf ~/build-temp
+          EOF
+
 
 
 
