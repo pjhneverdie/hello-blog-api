@@ -22,6 +22,7 @@ public class MemberForm {
     private final String name;
 
     @Email(message = "올바른 이메일을 입력해 주세요.", groups = MemberSaveGroup.Email.class)
+    @NotNull(message = "이메일은 필수입니다.", groups = MemberSaveGroup.NotNull.class)
     private final String email;
 
     public MemberForm(Integer id, String name, String email) {

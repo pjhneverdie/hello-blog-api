@@ -92,15 +92,20 @@ class MemberFormTest {
 
     @Test
     public void validateEmail() throws NoSuchFieldException {
-        // Given
+        MemberForm memberFormNullEmail = new MemberForm(1, "name", null);
         MemberForm memberFormNotEmail = new MemberForm(1, "name", "email");
+
+        String notNullMessage = MemberForm.class.getDeclaredField("email").getAnnotation(NotNull.class).message();
         String notEmailMessage = MemberForm.class.getDeclaredField("email").getAnnotation(Email.class).message();
 
-        // When
-        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNotEmail, MemberSaveGroup.class);
+        // null
+        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNullEmail, MemberSaveGroup.class);
+        boolean result = violations.stream().allMatch(violation -> violation.getMessage().equals(notNullMessage));
+        assertTrue(result);
 
-        // Then
-        boolean result = violations.stream().allMatch(violation -> violation.getMessage().equals(notEmailMessage));
+        // not email
+        violations = validator.validate(memberFormNotEmail, MemberSaveGroup.class);
+        result = violations.stream().allMatch(violation -> violation.getMessage().equals(notEmailMessage));
         assertTrue(result);
     }
 }
