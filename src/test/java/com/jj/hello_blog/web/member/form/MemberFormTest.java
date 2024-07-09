@@ -32,7 +32,7 @@ class MemberFormTest {
     @Test
     public void validateId() throws NoSuchFieldException {
         // Given
-        MemberForm memberForm = new MemberForm(null, "name", "email@email.com");
+        MemberForm memberForm = new MemberForm(null, "test@test.com", "123456");
         Field field = MemberForm.class.getDeclaredField("id");
 
         /**
@@ -56,44 +56,37 @@ class MemberFormTest {
     }
 
     @Test
-    public void validateName() throws NoSuchFieldException {
-        MemberForm memberFormNullName = new MemberForm(1, null, "email@email.com");
-        MemberForm memberFormBlankName = new MemberForm(1, null, "email@email.com");
-        MemberForm memberFormOverSizeName = new MemberForm(
-                1, "12345678910111213141516", "email@email.com");
-        MemberForm memberFormUnderSizeName = new MemberForm(1, "1", "email@email.com");
+    public void validatePassword() throws NoSuchFieldException {
+        MemberForm memberFormNullPassword = new MemberForm(1, "test@test.com", null);
+        MemberForm memberFormBlankPassword = new MemberForm(1, "test@test.com", "      ");
+        MemberForm memberFormUnderSizePassword = new MemberForm(1, "test@test.com", "12345");
 
-        Field field = MemberForm.class.getDeclaredField("name");
+        Field field = MemberForm.class.getDeclaredField("password");
 
         String notNullMessage = field.getAnnotation(NotNull.class).message();
         String notBlankMessage = field.getAnnotation(NotBlank.class).message();
         String sizeMessage = field.getAnnotation(Size.class).message();
 
         // null
-        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNullName, MemberSaveGroup.class);
+        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNullPassword, MemberSaveGroup.class);
         boolean result = violations.stream().allMatch(violation -> violation.getMessage().equals(notNullMessage));
         assertTrue(result);
 
         // blank
-        violations = validator.validate(memberFormBlankName, MemberSaveGroup.class);
+        violations = validator.validate(memberFormBlankPassword, MemberSaveGroup.class);
         result = violations.stream().allMatch(violation -> violation.getMessage().equals(notBlankMessage));
         assertTrue(result);
 
-        // over
-        violations = validator.validate(memberFormOverSizeName, MemberSaveGroup.class);
-        result = violations.stream().allMatch(violation -> violation.getMessage().equals(sizeMessage));
-        assertTrue(result);
-
         // under
-        violations = validator.validate(memberFormUnderSizeName, MemberSaveGroup.class);
+        violations = validator.validate(memberFormUnderSizePassword, MemberSaveGroup.class);
         result = violations.stream().allMatch(violation -> violation.getMessage().equals(sizeMessage));
         assertTrue(result);
     }
 
     @Test
     public void validateEmail() throws NoSuchFieldException {
-        MemberForm memberFormNullEmail = new MemberForm(1, "name", null);
-        MemberForm memberFormNotEmail = new MemberForm(1, "name", "email");
+        MemberForm memberFormNullEmail = new MemberForm(1, null, "123456");
+        MemberForm memberFormNotEmail = new MemberForm(1, "testtest", "123456");
 
         String notNullMessage = MemberForm.class.getDeclaredField("email").getAnnotation(NotNull.class).message();
         String notEmailMessage = MemberForm.class.getDeclaredField("email").getAnnotation(Email.class).message();

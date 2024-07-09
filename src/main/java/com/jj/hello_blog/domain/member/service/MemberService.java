@@ -15,4 +15,8 @@ public class MemberService {
     public Member signUp(MemberForm memberForm) {
         return memberRepository.signUp(memberForm.toMember());
     }
+
+    public boolean checkDuplicatedEmail(String email) {
+        return memberRepository.findByEmail(email).isPresent();
+    }
 }

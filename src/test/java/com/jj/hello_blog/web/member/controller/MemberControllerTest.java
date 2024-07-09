@@ -9,14 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MemberController.class)
 class MemberControllerTest {
@@ -30,16 +33,38 @@ class MemberControllerTest {
     @Test
     public void signUp() throws Exception {
         // Given
-        Member member = new Member(1,"John", "john@example.com");
+        Member member = new Member(1, "test@test.com", "123456");
         when(memberService.signUp(any(MemberForm.class))).thenReturn(member);
+
+        MockHttpSession session = new MockHttpSession();
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/member/signUp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"John\", \"email\": \"john@example.com\"}"));
+                .content("{\"email\": \"test@test.com\", \"password\": \"123456\"}")
+                .session(session));
 
         // Then
         resultActions.andExpect(status().isOk())
-                .andExpect(request().sessionAttribute(SessionConst.MEMBER_KEY, member));
+                .andExpect(jsonPath("$.email").value("test@test.com"))
+                .andExpect(jsonPath("$.password").value("123456"));
+
+        Member sessionMember = (Member) session.getAttribute(SessionConst.MEMBER_KEY);
+        assertNotNull(sessionMember);
+        assertEquals("test@test.com", sessionMember.getEmail());
+        assertEquals("123456", sessionMember.getPassword());
+    }
+
+    @Test
+    public void checkDuplicatedEmail() throws Exception {
+        // Given
+        when(memberService.checkDuplicatedEmail("test@test.com")).thenReturn(true);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/member/signUp/test@test.com"));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().string("true"));
     }
 }

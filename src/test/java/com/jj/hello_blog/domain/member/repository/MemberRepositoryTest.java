@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
@@ -19,13 +21,27 @@ class MemberRepositoryTest {
     @Test
     void signUp() {
         // Given
-        Member memberYet = new Member(null, "test", "test@test.com");
+        Member memberYet = new Member(null, "test@test.com", "123456");
 
         // When
         Member member = memberRepository.signUp(memberYet);
 
         // Then
         Assertions.assertThat(member.getId()).isNotNull();
+    }
+
+    @Test
+    void findByEmail() {
+        // Given
+        signUp();
+
+        // When
+        Optional<Member> member = memberRepository.findByEmail("test@test.com");
+        Optional<Member> newMember = memberRepository.findByEmail("new@test.com");
+
+        // Then
+        Assertions.assertThat(member).isNotEmpty();
+        Assertions.assertThat(newMember).isEmpty();
     }
 
 }

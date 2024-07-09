@@ -4,8 +4,14 @@
 <mapper namespace="com.jj.hello_blog.domain.member.repository.MemberMapper">
 
     <insert id="signUp" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO member(name, email)
-        VALUES (#{name}, #{email})
+        INSERT INTO member(email, password)
+        VALUES (#{email}, #{password})
     </insert>
+
+    <select id="findByEmail" resultType="Member">
+        SELECT id, email, password
+        FROM member
+        WHERE email = #{email}
+    </select>
 
 </mapper>
