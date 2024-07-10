@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.member.form;
+package com.jj.hello_blog.web.member.form.model;
 
 import com.jj.hello_blog.web.member.form.group.save.MemberSaveGroup;
 import com.jj.hello_blog.web.member.form.group.update.MemberUpdateGroup;
@@ -56,6 +56,25 @@ class MemberFormTest {
     }
 
     @Test
+    public void validateEmail() throws NoSuchFieldException {
+        MemberForm memberFormNullEmail = new MemberForm(1, null, "123456");
+        MemberForm memberFormNotEmail = new MemberForm(1, "testtest", "123456");
+
+        String notNullMessage = MemberForm.class.getDeclaredField("email").getAnnotation(NotNull.class).message();
+        String notEmailMessage = MemberForm.class.getDeclaredField("email").getAnnotation(Email.class).message();
+
+        // null
+        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNullEmail, MemberSaveGroup.class);
+        boolean result = violations.stream().allMatch(violation -> violation.getMessage().equals(notNullMessage));
+        assertTrue(result);
+
+        // not email
+        violations = validator.validate(memberFormNotEmail, MemberSaveGroup.class);
+        result = violations.stream().allMatch(violation -> violation.getMessage().equals(notEmailMessage));
+        assertTrue(result);
+    }
+
+    @Test
     public void validatePassword() throws NoSuchFieldException {
         MemberForm memberFormNullPassword = new MemberForm(1, "test@test.com", null);
         MemberForm memberFormBlankPassword = new MemberForm(1, "test@test.com", "      ");
@@ -80,25 +99,6 @@ class MemberFormTest {
         // under
         violations = validator.validate(memberFormUnderSizePassword, MemberSaveGroup.class);
         result = violations.stream().allMatch(violation -> violation.getMessage().equals(sizeMessage));
-        assertTrue(result);
-    }
-
-    @Test
-    public void validateEmail() throws NoSuchFieldException {
-        MemberForm memberFormNullEmail = new MemberForm(1, null, "123456");
-        MemberForm memberFormNotEmail = new MemberForm(1, "testtest", "123456");
-
-        String notNullMessage = MemberForm.class.getDeclaredField("email").getAnnotation(NotNull.class).message();
-        String notEmailMessage = MemberForm.class.getDeclaredField("email").getAnnotation(Email.class).message();
-
-        // null
-        Set<ConstraintViolation<MemberForm>> violations = validator.validate(memberFormNullEmail, MemberSaveGroup.class);
-        boolean result = violations.stream().allMatch(violation -> violation.getMessage().equals(notNullMessage));
-        assertTrue(result);
-
-        // not email
-        violations = validator.validate(memberFormNotEmail, MemberSaveGroup.class);
-        result = violations.stream().allMatch(violation -> violation.getMessage().equals(notEmailMessage));
         assertTrue(result);
     }
 }

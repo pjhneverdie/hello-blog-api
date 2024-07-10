@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.member.form;
+package com.jj.hello_blog.web.member.form.model;
 
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.web.member.form.group.save.MemberSaveGroup;
