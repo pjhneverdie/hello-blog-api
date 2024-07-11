@@ -1,5 +1,6 @@
 package com.jj.hello_blog.web.member.form.model;
 
+import com.jj.hello_blog.web.member.form.SignInForm;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

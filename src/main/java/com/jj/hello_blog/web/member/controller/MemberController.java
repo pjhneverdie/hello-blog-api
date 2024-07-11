@@ -2,16 +2,15 @@ package com.jj.hello_blog.web.member.controller;
 
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.domain.member.service.MemberService;
-import com.jj.hello_blog.web.member.form.model.MemberForm;
-import com.jj.hello_blog.web.member.form.group.save.MemberSaveGroupSequence;
-import com.jj.hello_blog.web.member.form.model.SignInForm;
+import com.jj.hello_blog.web.member.dto.MemberResponse;
+import com.jj.hello_blog.web.member.form.SignInForm;
+import com.jj.hello_blog.web.member.form.SignUpForm;
 import com.jj.hello_blog.web.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/member")
@@ -20,8 +19,19 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
+    @GetMapping("/me")
+    public MemberResponse me(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
+
+        Member member = (Member) session.getAttribute(SessionConst.MEMBER_KEY);
+
+        return member == null ? null : new MemberResponse(member.getEmail());
+    }
+
     @PostMapping("/signIn")
-    public Member signIn(@Valid @RequestBody SignInForm signInForm, HttpSession session) {
+    public MemberResponse signIn(@Valid @RequestBody SignInForm signInForm, HttpSession session) {
         Member member = memberService.signIn(signInForm);
 
         if (member == null) {
@@ -29,17 +39,20 @@ public class MemberController {
         }
 
         session.setAttribute(SessionConst.MEMBER_KEY, member);
-        return member;
+
+        return new MemberResponse(member.getEmail());
     }
 
     @PostMapping("/signUp")
-    public Member signUp(@Validated(MemberSaveGroupSequence.class) @RequestBody MemberForm memberForm, HttpSession session) {
-        Member member = memberService.signUp(memberForm);
+    public MemberResponse signUp(@Valid @RequestBody SignUpForm signUpForm, HttpSession session) {
+        Member member = memberService.signUp(signUpForm);
+
         session.setAttribute(SessionConst.MEMBER_KEY, member);
-        return member;
+
+        return new MemberResponse(member.getEmail());
     }
 
-    @GetMapping("/signUp/{email}")
+    @GetMapping("/{email}")
     public boolean checkDuplicatedEmail(@Valid @NotNull @Email @PathVariable String email) {
         return memberService.checkDuplicatedEmail(email);
     }

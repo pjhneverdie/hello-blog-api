@@ -2,8 +2,8 @@ package com.jj.hello_blog.web.member.controller;
 
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.domain.member.service.MemberService;
-import com.jj.hello_blog.web.member.form.model.MemberForm;
-import com.jj.hello_blog.web.member.form.model.SignInForm;
+import com.jj.hello_blog.web.member.form.SignInForm;
+import com.jj.hello_blog.web.member.form.SignUpForm;
 import com.jj.hello_blog.web.session.SessionConst;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,23 @@ class MemberControllerTest {
     private MemberService memberService;
 
     @Test
+    public void me() throws Exception {
+        // Given
+        Member member = new Member(1, "test@test.com", "123456");
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, member);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
+    }
+
+    @Test
     public void signIn() throws Exception {
+        // Given
         Member member = new Member(1, "test@test.com", "123456");
         when(memberService.signIn(any(SignInForm.class))).thenReturn(member);
 
@@ -46,20 +62,18 @@ class MemberControllerTest {
 
         // Then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("test@test.com"))
-                .andExpect(jsonPath("$.password").value("123456"));
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
 
         Member sessionMember = (Member) session.getAttribute(SessionConst.MEMBER_KEY);
-        assertNotNull(sessionMember);
-        assertEquals("test@test.com", sessionMember.getEmail());
-        assertEquals("123456", sessionMember.getPassword());
+        assertEquals(sessionMember.getEmail(), member.getEmail());
+        assertEquals(sessionMember.getPassword(), member.getPassword());
     }
 
     @Test
     public void signUp() throws Exception {
         // Given
         Member member = new Member(1, "test@test.com", "123456");
-        when(memberService.signUp(any(MemberForm.class))).thenReturn(member);
+        when(memberService.signUp(any(SignUpForm.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
 
@@ -71,13 +85,11 @@ class MemberControllerTest {
 
         // Then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("test@test.com"))
-                .andExpect(jsonPath("$.password").value("123456"));
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
 
         Member sessionMember = (Member) session.getAttribute(SessionConst.MEMBER_KEY);
-        assertNotNull(sessionMember);
-        assertEquals("test@test.com", sessionMember.getEmail());
-        assertEquals("123456", sessionMember.getPassword());
+        assertEquals(sessionMember.getEmail(), member.getEmail());
+        assertEquals(sessionMember.getPassword(), member.getPassword());
     }
 
     @Test
@@ -86,7 +98,7 @@ class MemberControllerTest {
         when(memberService.checkDuplicatedEmail("test@test.com")).thenReturn(true);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/member/signUp/test@test.com"));
+        ResultActions resultActions = mockMvc.perform(get("/member/test@test.com"));
 
         // Then
         resultActions.andExpect(status().isOk())

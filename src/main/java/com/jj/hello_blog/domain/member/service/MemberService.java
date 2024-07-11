@@ -2,8 +2,8 @@ package com.jj.hello_blog.domain.member.service;
 
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.domain.member.repository.MemberRepository;
-import com.jj.hello_blog.web.member.form.model.MemberForm;
-import com.jj.hello_blog.web.member.form.model.SignInForm;
+import com.jj.hello_blog.web.member.form.SignInForm;
+import com.jj.hello_blog.web.member.form.SignUpForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +25,9 @@ public class MemberService {
         return null;
     }
 
-    public Member signUp(MemberForm memberForm) {
-        return memberRepository.signUp(memberForm.toMember());
+    public Member signUp(SignUpForm signUpForm) {
+        Member member = new Member(null, signUpForm.getEmail(), signUpForm.getPassword());
+        return memberRepository.signUp(member);
     }
 
     public boolean checkDuplicatedEmail(String email) {

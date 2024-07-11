@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.member.form.model;
+package com.jj.hello_blog.web.member.form;
 
 import lombok.Getter;
 
