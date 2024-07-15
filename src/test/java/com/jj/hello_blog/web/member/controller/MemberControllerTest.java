@@ -33,6 +33,7 @@ class MemberControllerTest {
 
     @Test
     public void me() throws Exception {
+
         // Given
         Member member = new Member(1, "test@test.com", "123456");
         MockHttpSession session = new MockHttpSession();
