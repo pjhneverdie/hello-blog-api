@@ -52,6 +52,13 @@ public class MemberController {
         return new MemberResponse(member.getEmail());
     }
 
+    @GetMapping("/signOut")
+    public void signOut(HttpSession session) {
+        if (session != null) {
+            session.invalidate();
+        }
+    }
+
     @GetMapping("/{email}")
     public boolean checkDuplicatedEmail(@Valid @NotNull @Email @PathVariable String email) {
         return memberService.checkDuplicatedEmail(email);

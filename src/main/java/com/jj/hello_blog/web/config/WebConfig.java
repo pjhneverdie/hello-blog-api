@@ -12,6 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SignInCheckInterCeptor())
                 .order(1)
-                .addPathPatterns("/post/write");
+                .addPathPatterns("/post/image");
     }
 }

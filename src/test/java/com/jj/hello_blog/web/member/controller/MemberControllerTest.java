@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,11 +32,9 @@ class MemberControllerTest {
 
     @Test
     public void me() throws Exception {
-
         // Given
-        Member member = new Member(1, "test@test.com", "123456");
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute(SessionConst.MEMBER_KEY, member);
+        Member member = getMember();
+        MockHttpSession session = getMockHttpSession(member);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
@@ -50,7 +47,7 @@ class MemberControllerTest {
     @Test
     public void signIn() throws Exception {
         // Given
-        Member member = new Member(1, "test@test.com", "123456");
+        Member member = getMember();
         when(memberService.signIn(any(SignInForm.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
@@ -73,7 +70,7 @@ class MemberControllerTest {
     @Test
     public void signUp() throws Exception {
         // Given
-        Member member = new Member(1, "test@test.com", "123456");
+        Member member = getMember();
         when(memberService.signUp(any(SignUpForm.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
@@ -94,6 +91,21 @@ class MemberControllerTest {
     }
 
     @Test
+    public void signOut() throws Exception {
+        // Given
+        Member member = getMember();
+        MockHttpSession session = getMockHttpSession(member);
+
+        // When
+        mockMvc.perform(get("/member/signOut").session(session));
+        ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").doesNotExist());
+    }
+
+    @Test
     public void checkDuplicatedEmail() throws Exception {
         // Given
         when(memberService.checkDuplicatedEmail("test@test.com")).thenReturn(true);
@@ -104,5 +116,15 @@ class MemberControllerTest {
         // Then
         resultActions.andExpect(status().isOk())
                 .andExpect(content().string("true"));
+    }
+
+    private Member getMember() {
+        return new Member(1, "test@test.com", "123456");
+    }
+
+    private MockHttpSession getMockHttpSession(Member member) {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, member);
+        return session;
     }
 }
