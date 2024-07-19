@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class MemberSignUpForm extends MemberSignInForm {
+
     public MemberSignUpForm(String email, String password) {
         super(email, password);
     }
+
 }

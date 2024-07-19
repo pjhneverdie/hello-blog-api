@@ -1,10 +1,10 @@
 package com.jj.hello_blog.web.category.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jj.hello_blog.domain.category.entity.Category;
 import com.jj.hello_blog.domain.category.service.CategoryService;
 import com.jj.hello_blog.web.category.dto.CategoryResponse;
 import com.jj.hello_blog.web.category.form.CategoryAddForm;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {

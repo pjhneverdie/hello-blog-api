@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
-class CategoryRepositoryTest {
+public class CategoryRepositoryTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -51,7 +51,7 @@ class CategoryRepositoryTest {
         assertEquals(1 + children.size(), categories.size());
     }
 
-    private Category getRoot() {
+    public static Category getRoot() {
         return new Category(null, "root", null);
     }
 
