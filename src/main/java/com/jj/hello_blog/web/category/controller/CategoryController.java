@@ -1,5 +1,6 @@
 package com.jj.hello_blog.web.category.controller;
 
+import com.jj.hello_blog.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
@@ -7,12 +8,9 @@ import jakarta.validation.Valid;
 import com.jj.hello_blog.web.category.dto.CategoryResponse;
 import com.jj.hello_blog.web.category.form.CategoryAddForm;
 
-import com.jj.hello_blog.domain.category.service.CategoryService;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 @RequestMapping("/category")
 @RestController
@@ -23,5 +21,10 @@ public class CategoryController {
     @PostMapping("/add")
     CategoryResponse addCategory(@Valid @RequestBody CategoryAddForm categoryAddForm) {
         return categoryService.addCategory(categoryAddForm);
+    }
+
+    @GetMapping("/get")
+    List<CategoryResponse> getCategories() {
+        return categoryService.getCategories();
     }
 }

@@ -1,4 +1,4 @@
-package com.jj.hello_blog.domain.category.entity.mybatis;
+package com.jj.hello_blog.domain.category.entity;
 
 import lombok.Getter;
 

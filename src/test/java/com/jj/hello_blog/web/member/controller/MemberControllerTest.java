@@ -1,9 +1,11 @@
 package com.jj.hello_blog.web.member.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.domain.member.service.MemberService;
-import com.jj.hello_blog.web.member.form.SignInForm;
-import com.jj.hello_blog.web.member.form.SignUpForm;
+import com.jj.hello_blog.web.member.form.MemberSignInForm;
+import com.jj.hello_blog.web.member.form.MemberSignUpForm;
 import com.jj.hello_blog.web.session.SessionConst;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +50,16 @@ class MemberControllerTest {
     public void signIn() throws Exception {
         // Given
         Member member = getMember();
-        when(memberService.signIn(any(SignInForm.class))).thenReturn(member);
+        String memberJson = getMemberJson(member);
+
+        when(memberService.signIn(any(MemberSignInForm.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/member/signIn")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\": \"test@test.com\", \"password\": \"123456\"}")
+                .content(memberJson)
                 .session(session));
 
         // Then
@@ -71,14 +75,16 @@ class MemberControllerTest {
     public void signUp() throws Exception {
         // Given
         Member member = getMember();
-        when(memberService.signUp(any(SignUpForm.class))).thenReturn(member);
+        String memberJson = getMemberJson(member);
+
+        when(memberService.signUp(any(MemberSignUpForm.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/member/signUp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\": \"test@test.com\", \"password\": \"123456\"}")
+                .content(memberJson)
                 .session(session));
 
         // Then
@@ -120,6 +126,10 @@ class MemberControllerTest {
 
     private Member getMember() {
         return new Member(1, "test@test.com", "123456");
+    }
+
+    private String getMemberJson(Member member) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(member);
     }
 
     private MockHttpSession getMockHttpSession(Member member) {

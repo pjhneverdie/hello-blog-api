@@ -3,8 +3,8 @@ package com.jj.hello_blog.web.member.controller;
 import com.jj.hello_blog.domain.member.entity.Member;
 import com.jj.hello_blog.domain.member.service.MemberService;
 import com.jj.hello_blog.web.member.dto.MemberResponse;
-import com.jj.hello_blog.web.member.form.SignInForm;
-import com.jj.hello_blog.web.member.form.SignUpForm;
+import com.jj.hello_blog.web.member.form.MemberSignInForm;
+import com.jj.hello_blog.web.member.form.MemberSignUpForm;
 import com.jj.hello_blog.web.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class MemberController {
     }
 
     @PostMapping("/signIn")
-    public MemberResponse signIn(@Valid @RequestBody SignInForm signInForm, HttpSession session) {
+    public MemberResponse signIn(@Valid @RequestBody MemberSignInForm signInForm, HttpSession session) {
         Member member = memberService.signIn(signInForm);
 
         if (member == null) {
@@ -44,8 +44,8 @@ public class MemberController {
     }
 
     @PostMapping("/signUp")
-    public MemberResponse signUp(@Valid @RequestBody SignUpForm signUpForm, HttpSession session) {
-        Member member = memberService.signUp(signUpForm);
+    public MemberResponse signUp(@Valid @RequestBody MemberSignUpForm memberSignUpForm, HttpSession session) {
+        Member member = memberService.signUp(memberSignUpForm);
 
         session.setAttribute(SessionConst.MEMBER_KEY, member);
 

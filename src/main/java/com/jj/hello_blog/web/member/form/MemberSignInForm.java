@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Getter
-public class SignInForm {
+public class MemberSignInForm {
 
     @Email
     @NotNull
@@ -19,7 +19,7 @@ public class SignInForm {
     @NotNull()
     private final String password;
 
-    public SignInForm(String email, String password) {
+    public MemberSignInForm(String email, String password) {
         this.email = email;
         this.password = password;
     }
