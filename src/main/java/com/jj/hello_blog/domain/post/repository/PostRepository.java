@@ -18,8 +18,10 @@ public class PostRepository {
         return post;
     }
 
-    public Optional<Post> findPostById(int id) {
-        return Optional.ofNullable(postMapper.findPostById(id));
+    public Optional<Post> findById(int id) {
+        return Optional.ofNullable(postMapper.findById(id));
     }
+
+
 
 }

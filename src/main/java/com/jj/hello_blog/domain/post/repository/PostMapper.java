@@ -8,6 +8,6 @@ public interface PostMapper {
 
     void post(Post post);
 
-    Post findPostById(int id);
+    Post findById(int id);
 
 }

@@ -5,6 +5,7 @@ import com.jj.hello_blog.domain.category.repository.CategoryRepository;
 import com.jj.hello_blog.domain.category.repository.CategoryRepositoryTest;
 import com.jj.hello_blog.domain.post.entity.Post;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,11 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Transactional
 @SpringBootTest
-class PostRepositoryTest {
+public class PostRepositoryTest {
 
     @Autowired
     private PostRepository postRepository;
@@ -24,12 +23,17 @@ class PostRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    private Category category;
+
+    @BeforeEach
+    void setUp() {
+        category = CategoryRepositoryTest.getRoot();
+        categoryRepository.addCategory(category);
+    }
+
     @Test
     void post() {
         // Given
-        Category category = CategoryRepositoryTest.getRoot();
-        categoryRepository.addCategory(category);
-
         Post post = getPost(category);
 
         // When
@@ -40,23 +44,19 @@ class PostRepositoryTest {
     }
 
     @Test
-    void findPostById() {
+    void findById() {
         // Given
-        Category category = CategoryRepositoryTest.getRoot();
-        categoryRepository.addCategory(category);
-
         Post post = getPost(category);
-
         postRepository.post(post);
 
         // When
-        Optional<Post> optionalPost = postRepository.findPostById(post.getId());
+        Optional<Post> optionalPost = postRepository.findById(post.getId());
 
         // Then
         Assertions.assertThat(optionalPost.isPresent()).isTrue();
     }
 
-    private Post getPost(Category category) {
+    public static Post getPost(Category category) {
         return new Post(null, "test", "test", null, null, category.getId());
     }
 

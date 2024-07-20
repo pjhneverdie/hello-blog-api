@@ -25,7 +25,7 @@ public class PostService {
     }
 
     private Post findPostById(int id) {
-        Optional<Post> posted = postRepository.findPostById(id);
+        Optional<Post> posted = postRepository.findById(id);
 
         // 옵셔널이 비었을 경우는 sql 오류 말고 가능성이 없고 트랜잭션이 걸려있으니
         // isPresent 확인 안 함

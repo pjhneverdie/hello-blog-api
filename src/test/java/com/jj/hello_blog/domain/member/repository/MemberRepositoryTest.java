@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
-class MemberRepositoryTest {
+public class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -21,7 +21,7 @@ class MemberRepositoryTest {
     @Test
     void signUp() {
         // Given
-        Member memberYet = new Member(null, "test@test.com", "123456");
+        Member memberYet = getMemberYet();
 
         // When
         Member member = memberRepository.signUp(memberYet);
@@ -44,4 +44,7 @@ class MemberRepositoryTest {
         Assertions.assertThat(newMember).isEmpty();
     }
 
+    public static Member getMemberYet() {
+        return new Member(null, "test@test.com", "123456");
+    }
 }

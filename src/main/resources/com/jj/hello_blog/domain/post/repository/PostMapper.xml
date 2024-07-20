@@ -8,7 +8,7 @@
         VALUES (#{title}, #{content}, #{categoryId});
     </insert>
 
-    <select id="findPostById" resultType="Post">
+    <select id="findById" resultType="Post">
         SELECT id, title, content, created_at, fixed_at, category_id
         FROM post
         WHERE id = #{id}
