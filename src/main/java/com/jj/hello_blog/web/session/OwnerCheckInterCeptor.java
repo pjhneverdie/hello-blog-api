@@ -1,6 +1,6 @@
 package com.jj.hello_blog.web.session;
 
-import com.jj.hello_blog.domain.member.entity.Member;
+import com.jj.hello_blog.domain.member.dto.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

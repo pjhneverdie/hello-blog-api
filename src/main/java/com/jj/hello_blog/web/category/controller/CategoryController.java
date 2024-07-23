@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
 
-import com.jj.hello_blog.web.category.dto.CategoryResponse;
-import com.jj.hello_blog.web.category.form.CategoryAddForm;
+import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.web.category.form.CategorySaveForm;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +19,8 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/add")
-    CategoryResponse addCategory(@Valid @RequestBody CategoryAddForm categoryAddForm) {
-        return categoryService.addCategory(categoryAddForm);
+    CategoryResponse addCategory(@Valid @RequestBody CategorySaveForm categorySaveForm) {
+        return categoryService.addCategory(categorySaveForm);
     }
 
     @GetMapping("/get")

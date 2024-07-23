@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CategoryAddFormTest {
+class CategorySaveFormTest {
     private Validator validator;
 
     @BeforeEach
@@ -23,15 +23,15 @@ class CategoryAddFormTest {
 
     @Test
     void validateName() {
-        CategoryAddForm categoryAddFormNullName = new CategoryAddForm(null, null);
-        CategoryAddForm categoryAddFormBlankName = new CategoryAddForm(" ", null);
+        CategorySaveForm categorySaveFormNullName = new CategorySaveForm(null);
+        CategorySaveForm categorySaveFormBlankName = new CategorySaveForm(" ");
 
         // null
-        Set<ConstraintViolation<CategoryAddForm>> constraintViolations = validator.validate(categoryAddFormNullName);
+        Set<ConstraintViolation<CategorySaveForm>> constraintViolations = validator.validate(categorySaveFormNullName);
         assertFalse(constraintViolations.isEmpty());
 
         // empty
-        constraintViolations = validator.validate(categoryAddFormBlankName);
+        constraintViolations = validator.validate(categorySaveFormBlankName);
         assertFalse(constraintViolations.isEmpty());
     }
 

@@ -1,7 +1,7 @@
 package com.jj.hello_blog.domain.post.repository;
 
 
-import com.jj.hello_blog.domain.post.entity.Post;
+import com.jj.hello_blog.domain.post.dto.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -13,15 +13,25 @@ public class PostRepository {
 
     private final PostMapper postMapper;
 
-    public Post post(Post post) {
-        postMapper.post(post);
+    public Post save(Post post) {
+        postMapper.savePost(post);
         return post;
     }
 
-    public Optional<Post> findById(int id) {
-        return Optional.ofNullable(postMapper.findById(id));
+    public void updatePost(Post post) {
+        postMapper.updatePost(post);
     }
 
+    public void deletePostById(int id) {
+        postMapper.deletePostById(id);
+    }
 
+    public Optional<Post> findPostById(int id) {
+        return Optional.ofNullable(postMapper.findPostById(id));
+    }
+
+    public int countPostByCategoryId(int categoryId) {
+        return postMapper.countPostByCategoryId(categoryId);
+    }
 
 }

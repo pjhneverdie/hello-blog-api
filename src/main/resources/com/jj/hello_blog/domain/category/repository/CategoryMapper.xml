@@ -3,14 +3,55 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jj.hello_blog.domain.category.repository.CategoryMapper">
 
+    <resultMap id="CategoryResponseMap" type="CategoryResponse">
+        <id property="id" column="categoryId"/>
+        <result property="name" column="categoryName"/>
+        <collection property="posts" ofType="PostResponse">
+            <id property="id" column="postId"/>
+            <result property="title" column="title"/>
+            <result property="content" column="content"/>
+            <result property="createdAt" column="createdAt"/>
+            <result property="fixedAt" column="fixedAt"/>
+            <result property="categoryId" column="postCategoryId"/>
+            <result property="likeCount" column="likeCount"/>
+        </collection>
+    </resultMap>
+
     <insert id="addCategory" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO category(name, parent_id)
-        VALUES (#{name}, #{parentId})
+        INSERT INTO category(name)
+        VALUES (#{name})
     </insert>
 
-    <select id="getCategories" resultType="Category">
-        SELECT id, name, parent_id
-        FROM category
+    <select id="getCategories" resultMap="CategoryResponseMap">
+        SELECT c.id                     AS categoryId,
+               c.name                   AS categoryName,
+               p.id                     AS postId,
+               p.title,
+               p.content,
+               p.created_at             AS createdAt,
+               p.fixed_at               AS fixedAt,
+               p.category_id            AS postCategoryId,
+               COALESCE(l.likeCount, 0) AS likeCount
+        FROM category c
+                 JOIN (SELECT id,
+                              title,
+                              content,
+                              created_at,
+                              fixed_at,
+                              category_id,
+                              ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY created_at DESC) AS rn
+                       FROM post) p ON c.id = p.category_id AND <![CDATA[p.rn <= 5]]>
+                 LEFT JOIN (SELECT post_id,
+                                   COUNT(*) AS likeCount
+                            FROM `like`
+                            GROUP BY post_id) l ON p.id = l.post_id
+        ORDER BY c.id, p.created_at DESC;
     </select>
+
+    <delete id="deleteCategoryById">
+        DELETE
+        FROM category
+        WHERE id = #{id};
+    </delete>
 
 </mapper>

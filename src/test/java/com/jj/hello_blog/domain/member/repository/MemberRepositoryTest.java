@@ -1,6 +1,7 @@
 package com.jj.hello_blog.domain.member.repository;
 
-import com.jj.hello_blog.domain.member.entity.Member;
+import com.jj.hello_blog.domain.member.dto.Member;
+import jakarta.validation.constraints.AssertTrue;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -21,10 +20,10 @@ public class MemberRepositoryTest {
     @Test
     void signUp() {
         // Given
-        Member memberYet = getMemberYet();
+        Member member = getMember();
 
         // When
-        Member member = memberRepository.signUp(memberYet);
+        memberRepository.signUp(member);
 
         // Then
         Assertions.assertThat(member.getId()).isNotNull();
@@ -33,18 +32,17 @@ public class MemberRepositoryTest {
     @Test
     void findByEmail() {
         // Given
-        signUp();
+        Member member = getMember();
+        memberRepository.signUp(member);
 
         // When
-        Optional<Member> member = memberRepository.findByEmail("test@test.com");
-        Optional<Member> newMember = memberRepository.findByEmail("new@test.com");
+        Optional<Member> existMember = memberRepository.findByEmail("test@test.com");
 
         // Then
-        Assertions.assertThat(member).isNotEmpty();
-        Assertions.assertThat(newMember).isEmpty();
+        Assertions.assertThat(existMember.get().getId().equals(member.getId())).isTrue();
     }
 
-    public static Member getMemberYet() {
+    public static Member getMember() {
         return new Member(null, "test@test.com", "123456");
     }
 }

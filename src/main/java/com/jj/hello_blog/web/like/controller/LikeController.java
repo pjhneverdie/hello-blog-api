@@ -1,7 +1,8 @@
 package com.jj.hello_blog.web.like.controller;
 
+import com.jj.hello_blog.domain.like.dto.LikeSaveDto;
 import com.jj.hello_blog.domain.like.service.LikeService;
-import com.jj.hello_blog.web.like.form.LikeLikeForm;
+import com.jj.hello_blog.web.like.form.LikeSaveForm;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +17,9 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @PostMapping("/like")
-    int like(@Valid @RequestBody LikeLikeForm likeLikeForm) {
-        return likeService.like(likeLikeForm);
+    @PostMapping
+    int like(@RequestBody LikeSaveForm likeSaveForm) {
+        return likeService.saveLike(new LikeSaveDto(likeSaveForm.getMemberId(), likeSaveForm.getPostId(), likeSaveForm.getCommentId()));
     }
 
 }

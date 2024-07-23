@@ -3,15 +3,35 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jj.hello_blog.domain.post.repository.PostMapper">
 
-    <insert id="post" useGeneratedKeys="true" keyProperty="id">
+    <insert id="savePost" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO post(title, content, category_id)
         VALUES (#{title}, #{content}, #{categoryId});
     </insert>
 
-    <select id="findById" resultType="Post">
+    <update id="updatePost">
+        UPDATE post
+        SET title       = #{title},
+            content     = #{content},
+            category_id = #{categoryId}
+        WHERE id = #{id};
+    </update>
+
+    <delete id="deletePostById">
+        DELETE
+        FROM post
+        WHERE id = #{id};
+    </delete>
+
+    <select id="findPostById" resultType="Post">
         SELECT id, title, content, created_at, fixed_at, category_id
         FROM post
         WHERE id = #{id}
+    </select>
+
+    <select id="countPostByCategoryId" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        where category_id = #{categoryId}
     </select>
 
 </mapper>

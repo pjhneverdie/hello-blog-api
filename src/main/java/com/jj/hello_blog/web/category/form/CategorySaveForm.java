@@ -6,15 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class CategoryAddForm {
+public class CategorySaveForm {
     @NotBlank
     @NotNull
     private final String name;
 
-    private final Integer parentId;
-
-    public CategoryAddForm(String name, Integer parentId) {
+    public CategorySaveForm(String name) {
         this.name = name;
-        this.parentId = parentId;
     }
 }

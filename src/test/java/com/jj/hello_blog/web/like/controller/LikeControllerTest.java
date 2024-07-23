@@ -2,8 +2,9 @@ package com.jj.hello_blog.web.like.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jj.hello_blog.domain.like.dto.LikeSaveDto;
 import com.jj.hello_blog.domain.like.service.LikeService;
-import com.jj.hello_blog.web.like.form.LikeLikeForm;
+import com.jj.hello_blog.web.like.form.LikeSaveForm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,14 +30,14 @@ class LikeControllerTest {
     @Test
     void like() throws Exception {
         // Given
-        String likeLikeFormJson = getLikeLikeFormJson(getLikeLikeForm());
+        String likeSaveFormJson = getLikeSaveFormJson(getLikeSaveForm());
 
-        when(likeService.like(any(LikeLikeForm.class))).thenReturn(1);
+        when(likeService.saveLike(any(LikeSaveDto.class))).thenReturn(1);
 
         // When
-        ResultActions resultActions = mockMvc.perform(post("/like/like")
+        ResultActions resultActions = mockMvc.perform(post("/like")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(likeLikeFormJson));
+                .content(likeSaveFormJson));
 
         // Then
         resultActions
@@ -44,12 +45,12 @@ class LikeControllerTest {
                 .andExpect(content().string("1"));
     }
 
-    private static LikeLikeForm getLikeLikeForm() {
-        return new LikeLikeForm(1, 1);
+    private LikeSaveForm getLikeSaveForm() {
+        return new LikeSaveForm(1, 1, 1);
     }
 
-    private static String getLikeLikeFormJson(LikeLikeForm likeLikeForm) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(likeLikeForm);
+    private String getLikeSaveFormJson(LikeSaveForm likeSaveForm) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(likeSaveForm);
     }
-    
+
 }

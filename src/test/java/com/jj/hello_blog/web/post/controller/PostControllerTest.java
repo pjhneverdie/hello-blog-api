@@ -3,10 +3,13 @@ package com.jj.hello_blog.web.post.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jj.hello_blog.common.aws.service.S3BucketService;
-import com.jj.hello_blog.domain.post.entity.Post;
+import com.jj.hello_blog.domain.post.dto.PostResponse;
+import com.jj.hello_blog.domain.post.dto.PostSaveDto;
+import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
 import com.jj.hello_blog.domain.post.service.PostService;
 import com.jj.hello_blog.web.post.form.PostSaveForm;
 
+import com.jj.hello_blog.web.post.form.PostUpdateForm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PostController.class)
@@ -65,9 +69,9 @@ class PostControllerTest {
     public void post() throws Exception {
         // Given
         PostSaveForm postSaveForm = getPostSaveForm();
-        Post postFromPostSaveForm = getPostFromPostSaveForm(postSaveForm);
+        PostResponse post = getPostResponse(postSaveForm);
 
-        when(postService.post(any(PostSaveForm.class))).thenReturn(postFromPostSaveForm);
+        when(postService.save(any(PostSaveDto.class))).thenReturn(post);
 
         // When
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/post/post")
@@ -77,19 +81,71 @@ class PostControllerTest {
         // Then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(postFromPostSaveForm.getTitle()))
-                .andExpect(jsonPath("$.content").value(postFromPostSaveForm.getContent()));
+                .andExpect(jsonPath("$.title").value(post.getTitle()))
+                .andExpect(jsonPath("$.content").value(post.getContent()));
     }
+
+    @Test
+    public void update() throws Exception {
+        // Given
+        PostUpdateForm postUpdateForm = getPostUpdateForm();
+        PostResponse postResponse = getPostResponse(postUpdateForm);
+
+        when(postService.updatePost(any(PostUpdateDto.class))).thenReturn(postResponse);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(patch("/post/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getPostUpdateFormJson(postUpdateForm)));
+
+        // Then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(postResponse.getId()))
+                .andExpect(jsonPath("$.title").value(postResponse.getTitle()))
+                .andExpect(jsonPath("$.content").value(postResponse.getContent()));
+    }
+
 
     private PostSaveForm getPostSaveForm() {
         return new PostSaveForm("test", "test", 1);
+    }
+
+    private PostResponse getPostResponse(PostSaveForm postSaveForm) {
+        return new PostResponse(
+                1,
+                postSaveForm.getTitle(),
+                postSaveForm.getContent(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                postSaveForm.getCategoryId(),
+                0,
+                0);
     }
 
     private String getPostSaveFormJson(PostSaveForm postSaveForm) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(postSaveForm);
     }
 
-    private Post getPostFromPostSaveForm(PostSaveForm postSaveForm) {
-        return new Post(1, postSaveForm.getTitle(), postSaveForm.getContent(), LocalDateTime.now(), LocalDateTime.now(), postSaveForm.getCategoryId());
+    ////
+    private PostUpdateForm getPostUpdateForm() {
+        return new PostUpdateForm(1, "test", "test", 1);
     }
+
+    private PostResponse getPostResponse(PostUpdateForm postUpdateForm) {
+        return new PostResponse(
+                postUpdateForm.getId(),
+                postUpdateForm.getTitle(),
+                postUpdateForm.getContent(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                postUpdateForm.getCategoryId(),
+                0,
+                0);
+    }
+
+    private String getPostUpdateFormJson(PostUpdateForm postUpdateForm) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(postUpdateForm);
+    }
+
 }

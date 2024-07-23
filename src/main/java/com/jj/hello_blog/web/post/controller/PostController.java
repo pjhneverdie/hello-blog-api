@@ -1,9 +1,12 @@
 package com.jj.hello_blog.web.post.controller;
 
 import com.jj.hello_blog.common.aws.service.S3BucketService;
-import com.jj.hello_blog.domain.post.entity.Post;
+import com.jj.hello_blog.domain.post.dto.PostResponse;
+import com.jj.hello_blog.domain.post.dto.PostSaveDto;
+import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
 import com.jj.hello_blog.domain.post.service.PostService;
 import com.jj.hello_blog.web.post.form.PostSaveForm;
+import com.jj.hello_blog.web.post.form.PostUpdateForm;
 import com.jj.hello_blog.web.post.validation.FileTypeConstraint;
 
 import jakarta.validation.Valid;
@@ -11,17 +14,16 @@ import jakarta.validation.constraints.NotNull;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/post")
 @RestController
 @RequiredArgsConstructor
 public class PostController {
+
     private final S3BucketService s3BucketService;
+
     private final PostService postService;
 
     @PostMapping("/image")
@@ -30,7 +32,21 @@ public class PostController {
     }
 
     @PostMapping("/post")
-    public Post post(@Valid @RequestBody PostSaveForm postSaveForm) {
-        return postService.post(postSaveForm);
+    public PostResponse post(@Valid @RequestBody PostSaveForm postSaveForm) {
+        return postService.save(new PostSaveDto(postSaveForm.getTitle(), postSaveForm.getContent(), postSaveForm.getCategoryId()));
     }
+
+    @PatchMapping("/post")
+    public PostResponse updatePost(@Valid @RequestBody PostUpdateForm postUpdateForm) {
+        return postService.updatePost(
+                new PostUpdateDto(
+                        postUpdateForm.getId(), postUpdateForm.getTitle(),
+                        postUpdateForm.getContent(), postUpdateForm.getCategoryId()));
+    }
+
+    @DeleteMapping("/post/{id}")
+    public boolean deletePostById(@PathVariable int id) {
+        return postService.deletePostById(id);
+    }
+
 }

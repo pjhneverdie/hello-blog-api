@@ -1,8 +1,8 @@
 package com.jj.hello_blog.web.member.controller;
 
-import com.jj.hello_blog.domain.member.entity.Member;
+import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.domain.member.service.MemberService;
-import com.jj.hello_blog.web.member.dto.MemberResponse;
+import com.jj.hello_blog.domain.member.dto.MemberResponse;
 import com.jj.hello_blog.web.member.form.MemberSignInForm;
 import com.jj.hello_blog.web.member.form.MemberSignUpForm;
 import com.jj.hello_blog.web.session.SessionConst;

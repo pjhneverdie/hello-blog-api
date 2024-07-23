@@ -1,82 +1,84 @@
 package com.jj.hello_blog.domain.like.repository;
 
-import com.jj.hello_blog.domain.category.entity.Category;
-import com.jj.hello_blog.domain.category.repository.CategoryRepository;
-import com.jj.hello_blog.domain.category.repository.CategoryRepositoryTest;
-import com.jj.hello_blog.domain.like.entity.Like;
-import com.jj.hello_blog.domain.member.entity.Member;
-import com.jj.hello_blog.domain.member.repository.MemberRepository;
-import com.jj.hello_blog.domain.member.repository.MemberRepositoryTest;
-import com.jj.hello_blog.domain.post.entity.Post;
-import com.jj.hello_blog.domain.post.repository.PostRepository;
-import com.jj.hello_blog.domain.post.repository.PostRepositoryTest;
-import jakarta.validation.constraints.AssertTrue;
+import com.jj.hello_blog.domain.comment.dto.Comment;
+import com.jj.hello_blog.domain.like.dto.Like;
+import com.jj.hello_blog.domain.member.dto.Member;
+import com.jj.hello_blog.domain.post.dto.Post;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Transactional
-@SpringBootTest
-class LikeRepositoryTest {
+class LikeRepositoryTest extends LikeRepositorySetUpTest {
 
     @Autowired
     private LikeRepository likeRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Test
+    @DisplayName("게시글 좋아요 테스트")
+    void savePostLike() {
+        // Given
+        Like like = getLike(member, post, null);
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+        // When
+        likeRepository.saveLike(like);
 
-    @Autowired
-    private PostRepository postRepository;
-
-    private Member member;
-
-    private Post post;
-
-    // like 레포지토리 테스트를 위한 베이스 작업
-    @BeforeEach
-    void setUp() {
-        this.member = memberRepository.signUp(MemberRepositoryTest.getMemberYet());
-
-        Category category = CategoryRepositoryTest.getRoot();
-        categoryRepository.addCategory(category);
-
-        this.post = postRepository.post(PostRepositoryTest.getPost(category));
+        // Then
+        assertNotNull(like.getId());
     }
 
     @Test
-    void like() {
+    @DisplayName("게시글 총 좋아요 수 조회 테스트")
+    void countPostLikeById() {
         // Given
-        Like like = getLike();
+        int beforeLikeCount = likeRepository.countLikeById(post.getId(), null);
 
         // When
-        Like liked = likeRepository.like(like);
+        savePostLike();
 
         // Then
-        assertNotNull(liked.getId());
+        int afterLikeCount = likeRepository.countLikeById(post.getId(), null);
+        Assertions.assertThat(beforeLikeCount < afterLikeCount).isTrue();
     }
 
     @Test
-    void findTotalCount() {
+    @DisplayName("댓글 좋아요 테스트")
+    void saveCommentLike() {
         // Given
-        int totalCount1 = likeRepository.findTotalCount(post.getId(), null);
+        Like like = getLike(member, post, comment);
 
         // When
-        like();
+        likeRepository.saveLike(like);
 
         // Then
-        int totalCount2 = likeRepository.findTotalCount(post.getId(), null);
-        Assertions.assertThat(totalCount1 < totalCount2).isTrue();
+        assertNotNull(like.getId());
     }
 
-    private Like getLike() {
-        return new Like(null, member.getId(), post.getId());
+    @Test
+    @DisplayName("댓글 총 좋아요 수 조회 테스트")
+    void countCommentLikeById() {
+        // Given
+        int beforeLikeCount = likeRepository.countLikeById(post.getId(), comment.getId());
+
+        // When
+        saveCommentLike();
+
+        // Then
+        int afterLikeCount = likeRepository.countLikeById(post.getId(), comment.getId());
+        Assertions.assertThat(beforeLikeCount < afterLikeCount).isTrue();
+    }
+
+
+    /**
+     * getLike, 좋아요 데이터 생성 유틸
+     *
+     * @return 좋아요 데이터
+     */
+    private Like getLike(Member member, Post post, Comment comment) {
+        return new Like(null, member.getId(), post.getId(), comment != null ? comment.getId() : null);
     }
 }

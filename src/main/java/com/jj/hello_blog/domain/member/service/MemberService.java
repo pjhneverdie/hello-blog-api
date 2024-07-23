@@ -1,6 +1,6 @@
 package com.jj.hello_blog.domain.member.service;
 
-import com.jj.hello_blog.domain.member.entity.Member;
+import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.domain.member.repository.MemberRepository;
 import com.jj.hello_blog.web.member.form.MemberSignInForm;
 import com.jj.hello_blog.web.member.form.MemberSignUpForm;

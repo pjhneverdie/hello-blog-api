@@ -3,12 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jj.hello_blog.domain.like.repository.LikeMapper">
 
-    <insert id="like" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO `like`(member_id, post_id)
-        VALUES (#{memberId}, #{postId})
+    <insert id="saveLike" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `like`(member_id, post_id, comment_id)
+        VALUES (#{memberId}, #{postId}, #{commentId})
     </insert>
 
-    <select id="findTotalCount" resultType="int">
+    <select id="countLikeById" resultType="int">
         SELECT COUNT(*)
         FROM `like`
         WHERE post_id = #{postId}

@@ -1,6 +1,7 @@
 package com.jj.hello_blog.domain.category.repository;
 
-import com.jj.hello_blog.domain.category.entity.Category;
+import com.jj.hello_blog.domain.category.dto.Category;
+import com.jj.hello_blog.domain.category.dto.CategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,11 @@ public class CategoryRepository {
         categoryMapper.addCategory(category);
     }
 
-    public List<Category> getCategories() {
+    public List<CategoryResponse> getCategories() {
         return categoryMapper.getCategories();
+    }
+
+    public void deleteCategoryById(int id) {
+        categoryMapper.deleteCategoryById(id);
     }
 }

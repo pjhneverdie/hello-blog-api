@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.member.dto;
+package com.jj.hello_blog.domain.member.dto;
 
 import lombok.Getter;
 
