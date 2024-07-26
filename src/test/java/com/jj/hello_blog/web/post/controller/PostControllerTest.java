@@ -71,10 +71,10 @@ class PostControllerTest {
         PostSaveForm postSaveForm = getPostSaveForm();
         PostResponse post = getPostResponse(postSaveForm);
 
-        when(postService.save(any(PostSaveDto.class))).thenReturn(post);
+        when(postService.savePost(any(PostSaveDto.class))).thenReturn(post);
 
         // When
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/post/post")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/post")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getPostSaveFormJson(postSaveForm)));
 
@@ -94,7 +94,7 @@ class PostControllerTest {
         when(postService.updatePost(any(PostUpdateDto.class))).thenReturn(postResponse);
 
         // When
-        ResultActions resultActions = mockMvc.perform(patch("/post/update")
+        ResultActions resultActions = mockMvc.perform(patch("/post")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getPostUpdateFormJson(postUpdateForm)));
 
@@ -127,7 +127,6 @@ class PostControllerTest {
         return new ObjectMapper().writeValueAsString(postSaveForm);
     }
 
-    ////
     private PostUpdateForm getPostUpdateForm() {
         return new PostUpdateForm(1, "test", "test", 1);
     }

@@ -1,5 +1,6 @@
 package com.jj.hello_blog.web.category.controller;
 
+import com.jj.hello_blog.domain.category.dto.CategorySaveDto;
 import com.jj.hello_blog.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
@@ -18,12 +19,12 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping("/add")
-    CategoryResponse addCategory(@Valid @RequestBody CategorySaveForm categorySaveForm) {
-        return categoryService.addCategory(categorySaveForm);
+    @PostMapping()
+    CategoryResponse saveCategory(@Valid @RequestBody CategorySaveForm categorySaveForm) {
+        return categoryService.saveCategory(new CategorySaveDto(categorySaveForm.getName()));
     }
 
-    @GetMapping("/get")
+    @GetMapping
     List<CategoryResponse> getCategories() {
         return categoryService.getCategories();
     }

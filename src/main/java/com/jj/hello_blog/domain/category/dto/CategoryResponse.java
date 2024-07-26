@@ -12,7 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponse {
+
     private int id;
+
     private String name;
+
     private List<PostResponse> posts;
+
 }

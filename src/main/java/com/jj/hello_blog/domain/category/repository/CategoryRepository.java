@@ -13,8 +13,8 @@ public class CategoryRepository {
 
     private final CategoryMapper categoryMapper;
 
-    public void addCategory(Category category) {
-        categoryMapper.addCategory(category);
+    public void saveCategory(Category category) {
+        categoryMapper.saveCategory(category);
     }
 
     public List<CategoryResponse> getCategories() {
@@ -24,4 +24,5 @@ public class CategoryRepository {
     public void deleteCategoryById(int id) {
         categoryMapper.deleteCategoryById(id);
     }
+
 }

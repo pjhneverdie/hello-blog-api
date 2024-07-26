@@ -19,12 +19,15 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
 
+    /**
+     * savePost, 게시글 작성
+     */
     @Transactional
-    public PostResponse save(PostSaveDto postSaveDto) {
+    public PostResponse savePost(PostSaveDto postSaveDto) {
         Post post = new Post(null, postSaveDto.getTitle(),
                 postSaveDto.getContent(), null, null, postSaveDto.getCategoryId());
 
-        postRepository.save(post);
+        postRepository.savePost(post);
 
         // createdAt, fixedAt 받아오기
         post = findPostById(post.getId());
@@ -40,6 +43,9 @@ public class PostService {
                 0);
     }
 
+    /**
+     * updatePost, 게시글 수정
+     */
     @Transactional
     public PostResponse updatePost(PostUpdateDto postUpdateDto) {
         Post post = new Post(postUpdateDto.getId(), postUpdateDto.getTitle(),
@@ -61,6 +67,9 @@ public class PostService {
                 0);
     }
 
+    /**
+     * deletePostById, 게시글 삭제
+     */
     @Transactional
     public boolean deletePostById(int id) {
         int categoryId = findPostById(id).getCategoryId();
@@ -75,6 +84,9 @@ public class PostService {
         return true;
     }
 
+    /**
+     * findPostById, id로 게시글 조회
+     */
     private Post findPostById(int id) {
         Optional<Post> posted = postRepository.findPostById(id);
 
@@ -83,6 +95,9 @@ public class PostService {
         return posted.get();
     }
 
+    /**
+     * countPostByCategoryId, 카테고리에 해당하는 게시글 총 수 조회
+     */
     private int countPostByCategoryId(int categoryId) {
         return postRepository.countPostByCategoryId(categoryId);
     }

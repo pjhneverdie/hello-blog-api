@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class CommentRepositorySetUpTest {
+public class CommentRepositoryTestSetUp {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -40,10 +40,10 @@ public class CommentRepositorySetUpTest {
         memberRepository.signUp(member);
 
         this.category = CategoryRepositoryTest.getCategory();
-        categoryRepository.addCategory(category);
+        categoryRepository.saveCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);
-        postRepository.save(this.post);
+        postRepository.savePost(this.post);
     }
 
     @Test

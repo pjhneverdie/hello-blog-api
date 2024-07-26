@@ -31,12 +31,12 @@ public class PostController {
         return s3BucketService.putS3Object(file);
     }
 
-    @PostMapping("/post")
+    @PostMapping
     public PostResponse post(@Valid @RequestBody PostSaveForm postSaveForm) {
-        return postService.save(new PostSaveDto(postSaveForm.getTitle(), postSaveForm.getContent(), postSaveForm.getCategoryId()));
+        return postService.savePost(new PostSaveDto(postSaveForm.getTitle(), postSaveForm.getContent(), postSaveForm.getCategoryId()));
     }
 
-    @PatchMapping("/post")
+    @PatchMapping
     public PostResponse updatePost(@Valid @RequestBody PostUpdateForm postUpdateForm) {
         return postService.updatePost(
                 new PostUpdateDto(

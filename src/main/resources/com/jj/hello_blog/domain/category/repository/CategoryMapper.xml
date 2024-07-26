@@ -14,10 +14,11 @@
             <result property="fixedAt" column="fixedAt"/>
             <result property="categoryId" column="postCategoryId"/>
             <result property="likeCount" column="likeCount"/>
+            <result property="commentCount" column="commentCount"/>
         </collection>
     </resultMap>
 
-    <insert id="addCategory" useGeneratedKeys="true" keyProperty="id">
+    <insert id="saveCategory" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO category(name)
         VALUES (#{name})
     </insert>
@@ -31,7 +32,8 @@
                p.created_at             AS createdAt,
                p.fixed_at               AS fixedAt,
                p.category_id            AS postCategoryId,
-               COALESCE(l.likeCount, 0) AS likeCount
+               COALESCE(l.likeCount, 0) AS likeCount,
+               COALESCE(cm.commentCount, 0) AS commentCount
         FROM category c
                  JOIN (SELECT id,
                               title,
@@ -45,6 +47,10 @@
                                    COUNT(*) AS likeCount
                             FROM `like`
                             GROUP BY post_id) l ON p.id = l.post_id
+                 LEFT JOIN (SELECT post_id,
+                                   COUNT(*) AS commentCount
+                            FROM comment
+                            GROUP BY post_id) cm ON p.id = cm.post_id
         ORDER BY c.id, p.created_at DESC;
     </select>
 

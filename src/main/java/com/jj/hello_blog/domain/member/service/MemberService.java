@@ -1,9 +1,9 @@
 package com.jj.hello_blog.domain.member.service;
 
 import com.jj.hello_blog.domain.member.dto.Member;
+import com.jj.hello_blog.domain.member.dto.MemberSignInDto;
+import com.jj.hello_blog.domain.member.dto.MemberSignUpDto;
 import com.jj.hello_blog.domain.member.repository.MemberRepository;
-import com.jj.hello_blog.web.member.form.MemberSignInForm;
-import com.jj.hello_blog.web.member.form.MemberSignUpForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,22 +15,41 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public Member signIn(MemberSignInForm signInForm) {
-        Optional<Member> member = memberRepository.findByEmail(signInForm.getEmail());
+    /**
+     * signIn, 로그인
+     *
+     * @return 멤버
+     */
+    public Optional<Member> signIn(MemberSignInDto memberSignInDto) {
+        Optional<Member> member = memberRepository.findMemberByEmail(memberSignInDto.getEmail());
 
-        if (member.isPresent() && member.get().getPassword().equals(signInForm.getPassword())) {
-            return member.get();
+        if (member.isPresent() && member.get().getPassword().equals(memberSignInDto.getPassword())) {
+            return member;
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    public Member signUp(MemberSignUpForm memberSignUpForm) {
-        Member member = new Member(null, memberSignUpForm.getEmail(), memberSignUpForm.getPassword());
-        return memberRepository.signUp(member);
+    /**
+     * signUp, 회원가입
+     *
+     * @return 멤버
+     */
+    public Member signUp(MemberSignUpDto memberSignUpDto) {
+        Member member = new Member(null, memberSignUpDto.getEmail(), memberSignUpDto.getPassword());
+
+        memberRepository.signUp(member);
+
+        return member;
     }
 
+    /**
+     * checkDuplicatedEmail, 회원가입 전 중복 이메일 확인
+     *
+     * @return 이메일 중복 여부
+     */
     public boolean checkDuplicatedEmail(String email) {
-        return memberRepository.findByEmail(email).isPresent();
+        return memberRepository.findMemberByEmail(email).isPresent();
     }
+
 }

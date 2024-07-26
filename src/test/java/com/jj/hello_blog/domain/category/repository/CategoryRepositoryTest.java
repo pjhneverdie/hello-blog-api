@@ -22,20 +22,17 @@ public class CategoryRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    /**
-     * 카테고리에 속한 글이 있어야 카테고리 조회 시 join 응답을 제대로 테스트할 수 있음
-     */
     @Autowired
     private PostRepository postRepository;
 
     @Test
     @DisplayName("카테고리 추가 테스트")
-    void addCategory() {
+    void saveCategory() {
         // Given
         Category category = getCategory();
 
         // When
-        categoryRepository.addCategory(category);
+        categoryRepository.saveCategory(category);
 
         // Then
         assertNotNull(category.getId());
@@ -46,9 +43,10 @@ public class CategoryRepositoryTest {
     void getCategories() {
         // Given
         Category category = getCategory();
-        categoryRepository.addCategory(category);
+        categoryRepository.saveCategory(category);
 
-        Post postInCategory = postRepository.save(PostRepositoryTest.getPost(category));
+        Post postInCategory = PostRepositoryTest.getPost(category);
+        postRepository.savePost(postInCategory);
 
         // When
         List<CategoryResponse> categories = categoryRepository.getCategories();
@@ -65,7 +63,7 @@ public class CategoryRepositoryTest {
     void deleteCategoryById() {
         // Given
         Category category = getCategory();
-        categoryRepository.addCategory(category);
+        categoryRepository.saveCategory(category);
 
         // When
         categoryRepository.deleteCategoryById(category.getId());
@@ -76,7 +74,9 @@ public class CategoryRepositoryTest {
     }
 
     /**
-     * 테스트용 카테고리 생성 유틸
+     * getCategory, 카테고리 데이터 생성 유틸
+     *
+     * @return 카테고리
      */
     public static Category getCategory() {
         return new Category(null, "test");

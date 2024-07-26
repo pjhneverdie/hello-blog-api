@@ -9,15 +9,15 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class MemberRepository {
+
     private final MemberMapper memberMapper;
 
-    public Member signUp(Member member) {
+    public void signUp(Member member) {
         memberMapper.signUp(member);
-        return member;
     }
 
-    public Optional<Member> findByEmail(String email) {
-        Member member = memberMapper.findByEmail(email);
-        return Optional.ofNullable(member);
+    public Optional<Member> findMemberByEmail(String email) {
+        return Optional.ofNullable(memberMapper.findMemberByEmail(email));
     }
+
 }

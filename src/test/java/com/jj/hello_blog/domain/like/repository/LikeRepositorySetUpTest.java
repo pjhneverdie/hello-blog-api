@@ -48,10 +48,10 @@ public class LikeRepositorySetUpTest {
         memberRepository.signUp(member);
 
         this.category = CategoryRepositoryTest.getCategory();
-        categoryRepository.addCategory(category);
+        categoryRepository.saveCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);
-        postRepository.save(this.post);
+        postRepository.savePost(this.post);
 
         this.comment = CommentRepositoryTest.getComment(this.member, this.post);
         commentRepository.saveComment(this.comment);

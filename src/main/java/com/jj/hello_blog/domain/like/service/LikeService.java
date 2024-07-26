@@ -14,8 +14,6 @@ public class LikeService {
 
     /**
      * saveLike, 게시글 or 댓글 좋아요 로직
-     *
-     * @return 좋아요를 누른 게시글 or 댓글의 총 좋아요 수 반환
      */
     public int saveLike(LikeSaveDto likeSaveDto) {
         Like like = new Like(null, likeSaveDto.getMemberId(), likeSaveDto.getPostId(), likeSaveDto.getCommentId());
@@ -33,8 +31,6 @@ public class LikeService {
 
     /**
      * countLikeById, 게시글의 총 좋아요 수 조회
-     *
-     * @return 게시글의 총 좋아요 수 반환
      */
     private int countLikeById(int postId) {
         return likeRepository.countLikeById(postId, null);
@@ -42,8 +38,6 @@ public class LikeService {
 
     /**
      * countLikeById, 댓글의 총 좋아요 수 조회
-     *
-     * @return 댓글의 총 좋아요 수 반환
      */
     private int countLikeById(int postId, int commentId) {
         return likeRepository.countLikeById(postId, commentId);

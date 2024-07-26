@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface CategoryMapper {
 
-    void addCategory(Category category);
+    void saveCategory(Category category);
 
     List<CategoryResponse> getCategories();
 
