@@ -7,7 +7,7 @@ import com.jj.hello_blog.domain.comment.service.CommentService;
 import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.web.comment.form.CommentSaveForm;
 import com.jj.hello_blog.web.comment.form.CommentUpdateForm;
-import com.jj.hello_blog.web.session.SessionConst;
+import com.jj.hello_blog.web.common.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

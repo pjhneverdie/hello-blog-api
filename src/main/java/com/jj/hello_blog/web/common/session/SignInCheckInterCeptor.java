@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.session;
+package com.jj.hello_blog.web.common.session;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.category.repository;
 
 import com.jj.hello_blog.domain.category.dto.Category;
 import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,12 +18,16 @@ public class CategoryRepository {
         categoryMapper.saveCategory(category);
     }
 
-    public List<CategoryResponse> getCategories() {
-        return categoryMapper.getCategories();
+    public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
+        categoryMapper.updateCategory(categoryUpdateDto);
     }
 
-    public void deleteCategoryById(int id) {
-        categoryMapper.deleteCategoryById(id);
+    public void deleteCategory(int id) {
+        categoryMapper.deleteCategory(id);
+    }
+
+    public List<CategoryResponse> findAllCategories() {
+        return categoryMapper.findAllCategories();
     }
 
 }

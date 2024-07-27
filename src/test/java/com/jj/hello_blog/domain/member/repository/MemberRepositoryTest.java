@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @Transactional
 @SpringBootTest
 public class MemberRepositoryTest {
@@ -19,23 +22,39 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("회원가입 테스트")
-    void signUp() {
+    void saveMember() {
         // Given
         Member member = getMember();
 
         // When
-        memberRepository.signUp(member);
+        memberRepository.saveMember(member);
 
         // Then
-        Assertions.assertThat(member.getId()).isNotNull();
+        assertNotNull(member.getId());
     }
+
+    @Test
+    @DisplayName("회원탈퇴 테스트")
+    void deleteMember() {
+        // Given
+        Member member = getMember();
+        memberRepository.saveMember(member);
+
+        // When
+        memberRepository.deleteMember(member.getId());
+
+        // Then
+        Optional<Member> existMember = memberRepository.findMemberByEmail(member.getEmail());
+        assertFalse(existMember.isPresent());
+    }
+
 
     @Test
     @DisplayName("이메일로 멤버 조회 테스트")
     void findMemberByEmail() {
         // Given
         Member member = getMember();
-        memberRepository.signUp(member);
+        memberRepository.saveMember(member);
 
         // When
         Optional<Member> existMember = memberRepository.findMemberByEmail(member.getEmail());
@@ -46,8 +65,6 @@ public class MemberRepositoryTest {
 
     /**
      * getMember, 멤버 데이터 생성 유틸
-     *
-     * @return 멤버
      */
     public static Member getMember() {
         return new Member(null, "test@test.com", "123456");

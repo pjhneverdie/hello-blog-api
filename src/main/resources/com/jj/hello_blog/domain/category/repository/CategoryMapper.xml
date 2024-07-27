@@ -23,16 +23,22 @@
         VALUES (#{name})
     </insert>
 
-    <select id="getCategories" resultMap="CategoryResponseMap">
-        SELECT c.id                     AS categoryId,
-               c.name                   AS categoryName,
-               p.id                     AS postId,
+    <update id="updateCategory">
+        UPDATE category
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findAllCategories" resultMap="CategoryResponseMap">
+        SELECT c.id                         AS categoryId,
+               c.name                       AS categoryName,
+               p.id                         AS postId,
                p.title,
                p.content,
-               p.created_at             AS createdAt,
-               p.fixed_at               AS fixedAt,
-               p.category_id            AS postCategoryId,
-               COALESCE(l.likeCount, 0) AS likeCount,
+               p.created_at                 AS createdAt,
+               p.fixed_at                   AS fixedAt,
+               p.category_id                AS postCategoryId,
+               COALESCE(l.likeCount, 0)     AS likeCount,
                COALESCE(cm.commentCount, 0) AS commentCount
         FROM category c
                  JOIN (SELECT id,
@@ -54,7 +60,7 @@
         ORDER BY c.id, p.created_at DESC;
     </select>
 
-    <delete id="deleteCategoryById">
+    <delete id="deleteCategory">
         DELETE
         FROM category
         WHERE id = #{id};

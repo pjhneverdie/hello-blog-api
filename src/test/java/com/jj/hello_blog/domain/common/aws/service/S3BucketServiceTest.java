@@ -1,8 +1,9 @@
-package com.jj.hello_blog.common.aws.service;
+package com.jj.hello_blog.domain.common.aws.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
+import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

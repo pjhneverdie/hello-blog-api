@@ -46,25 +46,16 @@ public class PostService {
     /**
      * updatePost, 게시글 수정
      */
-    @Transactional
-    public PostResponse updatePost(PostUpdateDto postUpdateDto) {
-        Post post = new Post(postUpdateDto.getId(), postUpdateDto.getTitle(),
-                postUpdateDto.getContent(), null, null, postUpdateDto.getCategoryId());
+    public boolean updatePost(PostUpdateDto postUpdateDto) {
+        Post post = new Post(
+                postUpdateDto.getId(), postUpdateDto.getTitle(),
+                postUpdateDto.getContent(), null,
+                null, postUpdateDto.getCategoryId()
+        );
 
         postRepository.updatePost(post);
 
-        // createdAt, fixedAt 받아오기
-        post = findPostById(post.getId());
-
-        return new PostResponse(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getFixedAt(),
-                post.getCategoryId(),
-                0,
-                0);
+        return true;
     }
 
     /**
@@ -78,7 +69,7 @@ public class PostService {
 
         // 해당 게시글이, 게시글이 속한 카테고리의 마지막 글이면 게시글도 삭제
         if (countPostByCategoryId(categoryId) == 0) {
-            categoryRepository.deleteCategoryById(categoryId);
+            categoryRepository.deleteCategory(categoryId);
         }
 
         return true;

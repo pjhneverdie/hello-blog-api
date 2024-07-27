@@ -1,4 +1,4 @@
-package com.jj.hello_blog.common.aws.service;
+package com.jj.hello_blog.domain.common.aws.service;
 
 import lombok.RequiredArgsConstructor;
 

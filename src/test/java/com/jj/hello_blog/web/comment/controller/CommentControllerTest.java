@@ -8,7 +8,7 @@ import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.web.ControllerTestBase;
 import com.jj.hello_blog.web.comment.form.CommentSaveForm;
 import com.jj.hello_blog.web.comment.form.CommentUpdateForm;
-import com.jj.hello_blog.web.session.SessionConst;
+import com.jj.hello_blog.web.common.session.SessionConst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

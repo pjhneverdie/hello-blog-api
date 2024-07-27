@@ -2,7 +2,7 @@ package com.jj.hello_blog.web.post.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jj.hello_blog.common.aws.service.S3BucketService;
+import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
 import com.jj.hello_blog.domain.post.dto.PostResponse;
 import com.jj.hello_blog.domain.post.dto.PostSaveDto;
 import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
@@ -91,7 +91,7 @@ class PostControllerTest {
         PostUpdateForm postUpdateForm = getPostUpdateForm();
         PostResponse postResponse = getPostResponse(postUpdateForm);
 
-        when(postService.updatePost(any(PostUpdateDto.class))).thenReturn(postResponse);
+        when(postService.updatePost(any(PostUpdateDto.class))).thenReturn(true);
 
         // When
         ResultActions resultActions = mockMvc.perform(patch("/post")
@@ -101,9 +101,7 @@ class PostControllerTest {
         // Then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(postResponse.getId()))
-                .andExpect(jsonPath("$.title").value(postResponse.getTitle()))
-                .andExpect(jsonPath("$.content").value(postResponse.getContent()));
+                .andExpect(content().string("true"));
     }
 
 

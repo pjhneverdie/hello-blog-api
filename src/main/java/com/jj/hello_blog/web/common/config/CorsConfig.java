@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.config;
+package com.jj.hello_blog.web.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 

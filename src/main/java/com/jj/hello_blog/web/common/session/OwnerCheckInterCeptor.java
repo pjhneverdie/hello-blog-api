@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.session;
+package com.jj.hello_blog.web.common.session;
 
 import com.jj.hello_blog.domain.member.dto.Member;
 import jakarta.servlet.http.HttpServletRequest;

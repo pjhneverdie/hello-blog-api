@@ -37,7 +37,7 @@ public class CommentRepositoryTestSetUp {
     @DisplayName("댓글 테스트 셋업")
     void setUp() {
         this.member = MemberRepositoryTest.getMember();
-        memberRepository.signUp(member);
+        memberRepository.saveMember(member);
 
         this.category = CategoryRepositoryTest.getCategory();
         categoryRepository.saveCategory(category);

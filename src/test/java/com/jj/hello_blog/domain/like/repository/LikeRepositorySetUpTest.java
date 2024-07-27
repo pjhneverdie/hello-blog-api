@@ -45,7 +45,7 @@ public class LikeRepositorySetUpTest {
     @DisplayName("좋아요를 누를 게시글, 댓글 셋업")
     void setUp() {
         this.member = MemberRepositoryTest.getMember();
-        memberRepository.signUp(member);
+        memberRepository.saveMember(member);
 
         this.category = CategoryRepositoryTest.getCategory();
         categoryRepository.saveCategory(category);

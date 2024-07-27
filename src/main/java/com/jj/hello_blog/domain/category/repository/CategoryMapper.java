@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.category.repository;
 
 import com.jj.hello_blog.domain.category.dto.Category;
 import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,8 +12,10 @@ public interface CategoryMapper {
 
     void saveCategory(Category category);
 
-    List<CategoryResponse> getCategories();
+    void updateCategory(CategoryUpdateDto category);
 
-    void deleteCategoryById(int id);
+    void deleteCategory(int id);
+
+    List<CategoryResponse> findAllCategories();
 
 }

@@ -1,7 +1,7 @@
-package com.jj.hello_blog.web.config;
+package com.jj.hello_blog.web.common.config;
 
-import com.jj.hello_blog.web.session.OwnerCheckInterCeptor;
-import com.jj.hello_blog.web.session.SignInCheckInterCeptor;
+import com.jj.hello_blog.web.common.session.OwnerCheckInterCeptor;
+import com.jj.hello_blog.web.common.session.SignInCheckInterCeptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -19,10 +19,14 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(signInCheckInterceptor)
                 .order(1)
-                .addPathPatterns("/comment/**");
+                .addPathPatterns(
+                        "/member/me", "/member/signOut", "/member/delete"
+                );
 
         registry.addInterceptor(ownerCheckInterceptor)
                 .order(2)
-                .addPathPatterns("/post/**");
+                .addPathPatterns(
+                        "/category/**"
+                );
     }
 }

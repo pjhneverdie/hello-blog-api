@@ -1,6 +1,7 @@
 package com.jj.hello_blog.domain.category.repository;
 
 import com.jj.hello_blog.domain.category.dto.Category;
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateDto;
 import com.jj.hello_blog.domain.post.dto.Post;
 import com.jj.hello_blog.domain.post.repository.PostRepository;
 import com.jj.hello_blog.domain.post.repository.PostRepositoryTest;
@@ -39,8 +40,42 @@ public class CategoryRepositoryTest {
     }
 
     @Test
+    @DisplayName("카테고리 수정 테스트")
+    void updateCategory() {
+        // Given
+        Category category = getCategory();
+        categoryRepository.saveCategory(category);
+
+        // When
+        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(category.getId(), category.getName() + "update");
+        categoryRepository.updateCategory(categoryUpdateDto);
+
+        // Then
+        List<CategoryResponse> categories = categoryRepository.findAllCategories();
+        categories.forEach((categoryResponse) -> {
+            assertEquals(categoryResponse.getId(), categoryUpdateDto.getId());
+            assertEquals(categoryResponse.getId(), (int) category.getId());
+        });
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제 테스트")
+    void deleteCategory() {
+        // Given
+        Category category = getCategory();
+        categoryRepository.saveCategory(category);
+
+        // When
+        categoryRepository.deleteCategory(category.getId());
+
+        // Then
+        List<CategoryResponse> categories = categoryRepository.findAllCategories();
+        assertTrue(categories.isEmpty());
+    }
+
+    @Test
     @DisplayName("카테고리 조회 테스트")
-    void getCategories() {
+    void findAllCategories() {
         // Given
         Category category = getCategory();
         categoryRepository.saveCategory(category);
@@ -49,7 +84,7 @@ public class CategoryRepositoryTest {
         postRepository.savePost(postInCategory);
 
         // When
-        List<CategoryResponse> categories = categoryRepository.getCategories();
+        List<CategoryResponse> categories = categoryRepository.findAllCategories();
 
         // Then
         categories.forEach((categoryResponse) -> {
@@ -58,25 +93,8 @@ public class CategoryRepositoryTest {
         });
     }
 
-    @Test
-    @DisplayName("카테고리 삭제 테스트")
-    void deleteCategoryById() {
-        // Given
-        Category category = getCategory();
-        categoryRepository.saveCategory(category);
-
-        // When
-        categoryRepository.deleteCategoryById(category.getId());
-
-        // Then
-        List<CategoryResponse> categories = categoryRepository.getCategories();
-        assertTrue(categories.isEmpty());
-    }
-
     /**
      * getCategory, 카테고리 데이터 생성 유틸
-     *
-     * @return 카테고리
      */
     public static Category getCategory() {
         return new Category(null, "test");

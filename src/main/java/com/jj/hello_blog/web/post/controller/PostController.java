@@ -1,6 +1,6 @@
 package com.jj.hello_blog.web.post.controller;
 
-import com.jj.hello_blog.common.aws.service.S3BucketService;
+import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
 import com.jj.hello_blog.domain.post.dto.PostResponse;
 import com.jj.hello_blog.domain.post.dto.PostSaveDto;
 import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
@@ -37,11 +37,13 @@ public class PostController {
     }
 
     @PatchMapping
-    public PostResponse updatePost(@Valid @RequestBody PostUpdateForm postUpdateForm) {
+    public boolean updatePost(@Valid @RequestBody PostUpdateForm postUpdateForm) {
         return postService.updatePost(
                 new PostUpdateDto(
                         postUpdateForm.getId(), postUpdateForm.getTitle(),
-                        postUpdateForm.getContent(), postUpdateForm.getCategoryId()));
+                        postUpdateForm.getContent(), postUpdateForm.getCategoryId()
+                )
+        );
     }
 
     @DeleteMapping("/post/{id}")

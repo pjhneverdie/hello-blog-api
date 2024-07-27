@@ -12,8 +12,12 @@ public class MemberRepository {
 
     private final MemberMapper memberMapper;
 
-    public void signUp(Member member) {
-        memberMapper.signUp(member);
+    public void saveMember(Member member) {
+        memberMapper.saveMember(member);
+    }
+
+    public void deleteMember(int id) {
+        memberMapper.deleteMember(id);
     }
 
     public Optional<Member> findMemberByEmail(String email) {

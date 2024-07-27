@@ -1,13 +1,19 @@
 package com.jj.hello_blog.web.member.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jj.hello_blog.domain.category.dto.CategorySaveDto;
+import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
+import com.jj.hello_blog.domain.common.exception.CustomException;
 import com.jj.hello_blog.domain.member.dto.Member;
+import com.jj.hello_blog.domain.member.dto.MemberResponse;
 import com.jj.hello_blog.domain.member.dto.MemberSignInDto;
 import com.jj.hello_blog.domain.member.dto.MemberSignUpDto;
+import com.jj.hello_blog.domain.member.exception.MemberExceptionCode;
 import com.jj.hello_blog.domain.member.service.MemberService;
+import com.jj.hello_blog.web.ControllerTestBase;
+import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.web.member.form.MemberSignInForm;
 import com.jj.hello_blog.web.member.form.MemberSignUpForm;
-import com.jj.hello_blog.web.session.SessionConst;
+import com.jj.hello_blog.web.common.session.SessionConst;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,19 +25,17 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MemberController.class)
-class MemberControllerTest {
+class MemberControllerTest extends ControllerTestBase {
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,66 +48,98 @@ class MemberControllerTest {
     public void me() throws Exception {
         // Given
         Member member = getMember();
-
         MockHttpSession session = getMockHttpSessionWithMember(member);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
 
         // Then
+        ApiResponse<MemberResponse> response = new ApiResponse<>(new MemberResponse(member.getEmail()));
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(member.getEmail()));
+                .andExpect(content().json(toJson(response)));
     }
 
     @Test
     @DisplayName("로그인 테스트")
     public void signIn() throws Exception {
         // Given
-        MemberSignInForm signInForm = new MemberSignInForm("test@test.com", "123456");
-        Member member = new Member(1, signInForm.getEmail(), signInForm.getPassword());
-        String signInFormJson = new ObjectMapper().writeValueAsString(signInForm);
+        MemberSignInForm memberSignInForm = new MemberSignInForm("test@test.com", "123456");
+
+        Member member = new Member(1, memberSignInForm.getEmail(), memberSignInForm.getPassword());
+
+        when(memberService.signIn(any(MemberSignInDto.class))).thenReturn(member);
 
         MockHttpSession session = new MockHttpSession();
-
-        when(memberService.signIn(any(MemberSignInDto.class))).thenReturn(Optional.of(member));
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/member/signIn")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(signInFormJson)
+                .content(toJson(memberSignInForm))
                 .session(session));
 
         // Then
+        ApiResponse<MemberResponse> response = new ApiResponse<>(new MemberResponse(member.getEmail()));
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(member.getEmail()));
+                .andExpect(content().json(toJson(response)));
 
         checkSessionAttribute(session, member);
+    }
+
+    @Test
+    @DisplayName("로그인 실패 테스트")
+    public void signInWithWrongMember() throws Exception {
+        // Given
+        MemberSignInForm memberSignInForm = new MemberSignInForm("test@test.com", "123456");
+
+        doThrow(new CustomException(MemberExceptionCode.SIGN_IN_FAILED))
+                .when(memberService)
+                .signIn(any(MemberSignInDto.class));
+
+        MockHttpSession session = new MockHttpSession();
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/member/signIn")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(memberSignInForm))
+                .session(session));
+
+        // Then
+        ApiResponse<Void> response = new ApiResponse<>(null);
+        response.setMessage(MemberExceptionCode.SIGN_IN_FAILED.message());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(response)));
     }
 
     @Test
     @DisplayName("회원가입 테스트")
     public void signUp() throws Exception {
         // Given
-        MemberSignUpForm signUpForm = new MemberSignUpForm("test@test.com", "123456");
-        Member member = new Member(1, signUpForm.getEmail(), signUpForm.getPassword());
-        String signUpFormJson = new ObjectMapper().writeValueAsString(signUpForm);
+        MemberSignUpForm memberSignUpForm = new MemberSignUpForm("test@test.com", "123456");
 
-        MockHttpSession session = new MockHttpSession();
+        Member member = new Member(1, memberSignUpForm.getEmail(), memberSignUpForm.getPassword());
 
         when(memberService.signUp(any(MemberSignUpDto.class))).thenReturn(member);
+
+        MockHttpSession session = new MockHttpSession();
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/member/signUp")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(signUpFormJson)
+                .content(toJson(memberSignUpForm))
                 .session(session));
 
         // Then
+        ApiResponse<MemberResponse> response = new ApiResponse<>(new MemberResponse(member.getEmail()));
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(member.getEmail()));
+                .andExpect(content().json(toJson(response)));
 
         checkSessionAttribute(session, member);
     }
@@ -116,13 +152,34 @@ class MemberControllerTest {
         MockHttpSession session = getMockHttpSessionWithMember(member);
 
         // When
-        mockMvc.perform(get("/member/signOut").session(session));
-        ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
+        ResultActions resultActions = mockMvc.perform(get("/member/signOut").session(session));
 
         // Then
+        ApiResponse<Boolean> response = new ApiResponse<>(true);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").doesNotExist());
+                .andExpect(content().json(toJson(response)));
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 테스트")
+    public void deleteMember() throws Exception {
+        // Given
+        Member member = getMember();
+        MockHttpSession session = getMockHttpSessionWithMember(member);
+
+        when(memberService.deleteMember(any(int.class))).thenReturn(true);
+
+        // When
+        ResultActions resultActions = mockMvc.perform(delete("/member/delete/" + member.getId()).session(session));
+
+        // Then
+        ApiResponse<Boolean> response = new ApiResponse<>(true);
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(response)));
     }
 
     @Test
@@ -135,15 +192,15 @@ class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(get("/member/test@test.com"));
 
         // Then
+        ApiResponse<Boolean> response = new ApiResponse<>(true);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(content().json(toJson(response)));
     }
 
     /**
      * getMember, 멤버 데이터 생성 유틸
-     *
-     * @return 멤버
      */
     private Member getMember() {
         return new Member(1, "test@test.com", "123456");
@@ -151,8 +208,6 @@ class MemberControllerTest {
 
     /**
      * getMockHttpSessionWithMember, 멤버 세션 생성 유틸
-     *
-     * @return 멤버 세션
      */
     private MockHttpSession getMockHttpSessionWithMember(Member member) {
         MockHttpSession session = new MockHttpSession();
@@ -162,8 +217,6 @@ class MemberControllerTest {
 
     /**
      * getMockHttpSessionWithMember, 멤버 세션 검증 유틸
-     *
-     * @return void
      */
     private void checkSessionAttribute(MockHttpSession session, Member member) {
         Member sessionMember = (Member) session.getAttribute(SessionConst.MEMBER_KEY);
