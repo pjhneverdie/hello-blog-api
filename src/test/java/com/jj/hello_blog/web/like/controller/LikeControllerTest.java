@@ -1,15 +1,21 @@
 package com.jj.hello_blog.web.like.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jj.hello_blog.domain.like.dto.LikeSaveDto;
+import com.jj.hello_blog.domain.like.dto.LikeCommentDto;
+import com.jj.hello_blog.domain.like.dto.LikePostDto;
 import com.jj.hello_blog.domain.like.service.LikeService;
-import com.jj.hello_blog.web.like.form.LikeSaveForm;
+import com.jj.hello_blog.domain.member.dto.Member;
+import com.jj.hello_blog.web.ControllerTestBase;
+import com.jj.hello_blog.web.common.response.ApiResponse;
+import com.jj.hello_blog.web.common.session.SessionConst;
+import com.jj.hello_blog.web.like.form.LikeCommentForm;
+import com.jj.hello_blog.web.like.form.LikePostForm;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -19,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LikeController.class)
-class LikeControllerTest {
+class LikeControllerTest extends ControllerTestBase {
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,29 +34,49 @@ class LikeControllerTest {
     private LikeService likeService;
 
     @Test
-    void like() throws Exception {
+    @DisplayName("게시글 좋아요 테스트")
+    void likePost() throws Exception {
         // Given
-        String likeSaveFormJson = getLikeSaveFormJson(getLikeSaveForm());
+        when(likeService.likePost(any(LikePostDto.class))).thenReturn(1);
 
-        when(likeService.saveLike(any(LikeSaveDto.class))).thenReturn(1);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, new Member(1, "test@test.com", "123456"));
 
         // When
-        ResultActions resultActions = mockMvc.perform(post("/like")
+        ResultActions resultActions = mockMvc.perform(post("/like/post")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(likeSaveFormJson));
+                .content(toJson(new LikePostForm(1, 1)))
+                .session(session));
 
         // Then
+        ApiResponse<Integer> response = new ApiResponse<>(1);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("1"));
+                .andExpect(content().json(toJson(response)));
     }
 
-    private LikeSaveForm getLikeSaveForm() {
-        return new LikeSaveForm(1, 1, 1);
-    }
+    @Test
+    @DisplayName("댓글 좋아요 테스트")
+    void likeComment() throws Exception {
+        // Given
+        when(likeService.likeComment(any(LikeCommentDto.class))).thenReturn(1);
 
-    private String getLikeSaveFormJson(LikeSaveForm likeSaveForm) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(likeSaveForm);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, new Member(1, "test@test.com", "123456"));
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/like/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(new LikeCommentForm(1, 1)))
+                .session(session));
+
+        // Then
+        ApiResponse<Integer> response = new ApiResponse<>(1);
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(response)));
     }
 
 }

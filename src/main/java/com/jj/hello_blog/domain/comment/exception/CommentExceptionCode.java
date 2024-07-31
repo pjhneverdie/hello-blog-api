@@ -1,14 +1,13 @@
-package com.jj.hello_blog.domain.category.exception;
+package com.jj.hello_blog.domain.comment.exception;
 
 import com.jj.hello_blog.domain.common.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
-public enum CategoryExceptionCode implements ExceptionCode {
-
-    // 이미 존재하는 카테고리를 또 추가 하려는 경우
-    DUPLICATED_CATEGORY(HttpStatus.SERVICE_UNAVAILABLE, "DUPLICATED_CATEGORY");
+public enum CommentExceptionCode implements ExceptionCode {
+    // 자기 댓글이 아닌데 삭제 혹은 수정 하려는 경우
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED");
 
     @Override
     public HttpStatus httpStatus() {

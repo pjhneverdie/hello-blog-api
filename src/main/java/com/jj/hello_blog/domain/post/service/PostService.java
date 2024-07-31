@@ -34,27 +34,18 @@ public class PostService {
 
         return new PostResponse(
                 post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getFixedAt(),
+                post.getTitle(), post.getContent(),
+                post.getCreatedAt(), post.getFixedAt(),
                 post.getCategoryId(),
-                0,
-                0);
+                0, 0
+        );
     }
 
     /**
      * updatePost, 게시글 수정
      */
     public boolean updatePost(PostUpdateDto postUpdateDto) {
-        Post post = new Post(
-                postUpdateDto.getId(), postUpdateDto.getTitle(),
-                postUpdateDto.getContent(), null,
-                null, postUpdateDto.getCategoryId()
-        );
-
-        postRepository.updatePost(post);
-
+        postRepository.updatePost(postUpdateDto);
         return true;
     }
 
@@ -62,10 +53,10 @@ public class PostService {
      * deletePostById, 게시글 삭제
      */
     @Transactional
-    public boolean deletePostById(int id) {
+    public boolean deletePost(int id) {
         int categoryId = findPostById(id).getCategoryId();
 
-        postRepository.deletePostById(id);
+        postRepository.deletePost(id);
 
         // 해당 게시글이, 게시글이 속한 카테고리의 마지막 글이면 게시글도 삭제
         if (countPostByCategoryId(categoryId) == 0) {

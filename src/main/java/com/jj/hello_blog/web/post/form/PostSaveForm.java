@@ -4,9 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class PostSaveForm {
+
     @Size(min = 1, max = 50)
     @NotBlank
     @NotNull
@@ -17,11 +20,6 @@ public class PostSaveForm {
     private final String content;
 
     @NotNull
-    private final int categoryId;
+    private final Integer categoryId;
 
-    public PostSaveForm(String title, String content, int categoryId) {
-        this.title = title;
-        this.content = content;
-        this.categoryId = categoryId;
-    }
 }

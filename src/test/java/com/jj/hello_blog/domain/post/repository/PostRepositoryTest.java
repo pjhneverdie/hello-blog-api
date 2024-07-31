@@ -3,6 +3,7 @@ package com.jj.hello_blog.domain.post.repository;
 import com.jj.hello_blog.domain.category.dto.Category;
 import com.jj.hello_blog.domain.post.dto.Post;
 
+import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +34,24 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
 
     @Test
     @DisplayName("게시글 수정 테스트")
-    void updateSavePost() {
+    void updatePost() {
         // Given
         Post post = getPost(category);
         postRepository.savePost(post);
 
-        Post newPost = new Post(
-                post.getId(), post.getTitle() + "update", post.getContent() + "update",
-                null, null, post.getCategoryId());
 
         // When
-        postRepository.updatePost(newPost);
+        PostUpdateDto postUpdateDto = new PostUpdateDto(
+                post.getId(),
+                post.getTitle() + "update", post.getContent() + "update",
+                post.getCategoryId()
+        );
+
+        postRepository.updatePost(postUpdateDto);
 
         // Then
-        assertEquals(post.getId(), newPost.getId());
-        assertNotEquals(post.getTitle(), newPost.getTitle());
-        assertNotEquals(post.getContent(), newPost.getContent());
+        Optional<Post> postById = postRepository.findPostById(post.getId());
+        assertEquals(postById.get().getId(), postUpdateDto.getId());
     }
 
     @Test
@@ -59,7 +62,7 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
         postRepository.savePost(post);
 
         // When
-        postRepository.deletePostById(post.getId());
+        postRepository.deletePost(post.getId());
 
         // Then
         Optional<Post> optionalPost = postRepository.findPostById(post.getId());

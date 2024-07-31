@@ -81,7 +81,7 @@ class CategoryControllerTest extends ControllerTestBase {
         response.setMessage(CategoryExceptionCode.DUPLICATED_CATEGORY.message());
 
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().is5xxServerError())
                 .andExpect(content().json(toJson(response)));
     }
 

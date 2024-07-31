@@ -21,6 +21,14 @@ class CategoryUpdateFormTest {
     }
 
     @Test
+    void validateId() {
+        CategoryUpdateForm categoryUpdateFormNullId = new CategoryUpdateForm(null, "test");
+
+        Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullId);
+        assertFalse(constraintViolations.isEmpty());
+    }
+
+    @Test
     void validateName() {
         CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null);
         CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ");

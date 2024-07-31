@@ -20,13 +20,16 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(signInCheckInterceptor)
                 .order(1)
                 .addPathPatterns(
-                        "/member/me", "/member/signOut", "/member/delete"
+                        "/member/me", "/member/signOut", "/member/delete/**",
+                        "/comment/**",
+                        "/like/**"
                 );
 
         registry.addInterceptor(ownerCheckInterceptor)
                 .order(2)
                 .addPathPatterns(
-                        "/category/**"
+                        "/category/**",
+                        "/post/**"
                 );
     }
 }

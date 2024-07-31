@@ -1,5 +1,6 @@
 package com.jj.hello_blog.web.comment.controller;
 
+import com.jj.hello_blog.domain.comment.dto.CommentDeleteDto;
 import com.jj.hello_blog.domain.comment.dto.CommentResponse;
 import com.jj.hello_blog.domain.comment.dto.CommentSaveDto;
 import com.jj.hello_blog.domain.comment.dto.CommentUpdateDto;
@@ -8,6 +9,7 @@ import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.web.ControllerTestBase;
 import com.jj.hello_blog.web.comment.form.CommentSaveForm;
 import com.jj.hello_blog.web.comment.form.CommentUpdateForm;
+import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.web.common.session.SessionConst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -57,13 +60,15 @@ class CommentControllerTest extends ControllerTestBase {
                 .session(session));
 
         // Then
+        ApiResponse<CommentResponse> response = new ApiResponse<>(commentResponse);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(commentResponse)));
+                .andExpect(content().json(toJson(response)));
     }
 
     @Test
-    @DisplayName("댓글 작성 테스트")
+    @DisplayName("댓글 수정 테스트")
     void updateComment() throws Exception {
         // Given
         // 폼
@@ -72,32 +77,50 @@ class CommentControllerTest extends ControllerTestBase {
         // 서비스 응답
         when(commentService.updateComment(any(CommentUpdateDto.class))).thenReturn(true);
 
+        // 세션
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, new Member(1, "test@test.com", "123456"));
+
         // When
         ResultActions resultActions = mockMvc.perform(patch("/comment")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(commentUpdateForm)));
+                .content(toJson(commentUpdateForm))
+                .session(session));
 
         // Then
+
+        ApiResponse<Boolean> response = new ApiResponse<>(true);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(content().json(toJson(response)));
     }
 
     @Test
+    @DisplayName("댓글 삭제 테스트")
     void deleteComment() throws Exception {
         // Given
         // 서비스 응답
-        when(commentService.deleteComment(any(int.class))).thenReturn(true);
+        when(commentService.deleteComment(any(CommentDeleteDto.class))).thenReturn(true);
+
+        // 세션
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionConst.MEMBER_KEY, new Member(1, "test@test.com", "123456"));
 
         // When
-        ResultActions resultActions = mockMvc.perform(delete("/comment/1"));
+        ResultActions resultActions = mockMvc.perform(delete("/comment/1").session(session));
 
         // Then
+        ApiResponse<Boolean> response = new ApiResponse<>(true);
+
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(content().json(toJson(response)));
     }
 
+    /**
+     * 댓글 응답 데이터 생성 유틸
+     */
     private CommentResponse getCommentResponse(CommentSaveForm commentSaveForm) {
         return new CommentResponse(
                 1,

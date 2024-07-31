@@ -7,6 +7,7 @@ import com.jj.hello_blog.domain.member.exception.MemberExceptionCode;
 import com.jj.hello_blog.domain.member.repository.MemberRepository;
 import com.jj.hello_blog.domain.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -34,11 +35,16 @@ public class MemberService {
      * signUp, 회원가입
      */
     public Member signUp(MemberSignUpDto memberSignUpDto) {
-        Member member = new Member(null, memberSignUpDto.getEmail(), memberSignUpDto.getPassword());
+        try {
+            Member member = new Member(null, memberSignUpDto.getEmail(), memberSignUpDto.getPassword());
 
-        memberRepository.saveMember(member);
+            memberRepository.saveMember(member);
 
-        return member;
+            return member;
+        } catch (DuplicateKeyException e) {
+            // 이메일 중복 시
+            throw new CustomException(MemberExceptionCode.DUPLICATED_EMAIL);
+        }
     }
 
     /**

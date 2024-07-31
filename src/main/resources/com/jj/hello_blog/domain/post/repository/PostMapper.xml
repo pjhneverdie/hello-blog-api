@@ -16,7 +16,7 @@
         WHERE id = #{id};
     </update>
 
-    <delete id="deletePostById">
+    <delete id="deletePost">
         DELETE
         FROM post
         WHERE id = #{id};

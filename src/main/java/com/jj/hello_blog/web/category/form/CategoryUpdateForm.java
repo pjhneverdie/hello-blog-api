@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryUpdateForm {
 
-    private final int id;
+    @NotNull
+    private final Integer id;
 
     @NotBlank
     @NotNull

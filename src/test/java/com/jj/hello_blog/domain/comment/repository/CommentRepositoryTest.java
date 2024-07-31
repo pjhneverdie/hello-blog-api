@@ -57,7 +57,7 @@ public class CommentRepositoryTest extends CommentRepositoryTestSetUp {
         commentRepository.saveComment(comment);
 
         // When
-        CommentUpdateDto commentUpdateDto = new CommentUpdateDto(comment.getId(), "");
+        CommentUpdateDto commentUpdateDto = new CommentUpdateDto(comment.getId(), "", member.getId());
         commentRepository.updateComment(commentUpdateDto);
 
         // Then
@@ -66,21 +66,6 @@ public class CommentRepositoryTest extends CommentRepositoryTestSetUp {
 
         commentById.get().getId().equals(commentUpdateDto.getId());
         commentById.get().getContent().equals(commentUpdateDto.getContent());
-    }
-
-    @Test
-    @DisplayName("id로 댓글 조회 테스트")
-    void findCommentById() {
-        // Given
-        Comment comment = getComment(member, post);
-        commentRepository.saveComment(comment);
-
-        // When
-        Optional<Comment> commentById = commentRepository.findCommentById(comment.getId());
-
-        // Then
-        assertTrue(commentById.isPresent());
-        commentById.get().getId().equals(comment.getId());
     }
 
     @Test
@@ -96,6 +81,21 @@ public class CommentRepositoryTest extends CommentRepositoryTestSetUp {
         // Then
         Optional<Comment> commentById = commentRepository.findCommentById(comment.getId());
         assertFalse(commentById.isPresent());
+    }
+
+    @Test
+    @DisplayName("id로 댓글 조회 테스트")
+    void findCommentById() {
+        // Given
+        Comment comment = getComment(member, post);
+        commentRepository.saveComment(comment);
+
+        // When
+        Optional<Comment> commentById = commentRepository.findCommentById(comment.getId());
+
+        // Then
+        assertTrue(commentById.isPresent());
+        commentById.get().getId().equals(comment.getId());
     }
 
     /**

@@ -1,14 +1,13 @@
-package com.jj.hello_blog.domain.category.exception;
+package com.jj.hello_blog.domain.like.exception;
 
 import com.jj.hello_blog.domain.common.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
-public enum CategoryExceptionCode implements ExceptionCode {
-
-    // 이미 존재하는 카테고리를 또 추가 하려는 경우
-    DUPLICATED_CATEGORY(HttpStatus.SERVICE_UNAVAILABLE, "DUPLICATED_CATEGORY");
+public enum LikeExceptionCode implements ExceptionCode {
+    // 좋아요 중복 시
+    DUPLICATED_LIKE(HttpStatus.SERVICE_UNAVAILABLE, "DUPLICATED_LIKE");
 
     @Override
     public HttpStatus httpStatus() {

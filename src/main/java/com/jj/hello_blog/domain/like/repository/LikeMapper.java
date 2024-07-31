@@ -1,14 +1,16 @@
 package com.jj.hello_blog.domain.like.repository;
 
+import com.jj.hello_blog.domain.like.dto.LikeCommentDto;
+import com.jj.hello_blog.domain.like.dto.LikePostDto;
 import org.apache.ibatis.annotations.Mapper;
-
-import com.jj.hello_blog.domain.like.dto.Like;
 
 @Mapper
 public interface LikeMapper {
 
-    void saveLike(Like like);
+    void savePostLike(LikePostDto like);
 
-    int countLikeById(int postId, Integer commentId);
+    void saveCommentLike(LikeCommentDto like);
+
+    int countLikeById(Integer postId, Integer commentId);
 
 }

@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.post.repository;
 
 
 import com.jj.hello_blog.domain.post.dto.Post;
+import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,12 +18,12 @@ public class PostRepository {
         postMapper.savePost(post);
     }
 
-    public void updatePost(Post post) {
-        postMapper.updatePost(post);
+    public void updatePost(PostUpdateDto postUpdateDto) {
+        postMapper.updatePost(postUpdateDto);
     }
 
-    public void deletePostById(int id) {
-        postMapper.deletePostById(id);
+    public void deletePost(int id) {
+        postMapper.deletePost(id);
     }
 
     public Optional<Post> findPostById(int id) {

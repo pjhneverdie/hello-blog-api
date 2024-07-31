@@ -1,13 +1,15 @@
 package com.jj.hello_blog.web.post.form;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class PostUpdateForm extends PostSaveForm {
 
-    private final int id;
+    @NotNull
+    private final Integer id;
 
-    public PostUpdateForm(int id, String title, String content, int categoryId) {
+    public PostUpdateForm(Integer id, String title, String content, Integer categoryId) {
         super(title, content, categoryId);
         this.id = id;
     }

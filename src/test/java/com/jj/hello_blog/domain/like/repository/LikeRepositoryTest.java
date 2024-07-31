@@ -1,19 +1,17 @@
 package com.jj.hello_blog.domain.like.repository;
 
-import com.jj.hello_blog.domain.comment.dto.Comment;
-import com.jj.hello_blog.domain.like.dto.Like;
-import com.jj.hello_blog.domain.member.dto.Member;
-import com.jj.hello_blog.domain.post.dto.Post;
+import com.jj.hello_blog.domain.like.dto.LikeCommentDto;
+import com.jj.hello_blog.domain.like.dto.LikePostDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-class LikeRepositoryTest extends LikeRepositorySetUpTest {
+class LikeRepositoryTest extends LikeRepositoryTestSetUp {
 
     @Autowired
     private LikeRepository likeRepository;
@@ -22,13 +20,14 @@ class LikeRepositoryTest extends LikeRepositorySetUpTest {
     @DisplayName("게시글 좋아요 테스트")
     void savePostLike() {
         // Given
-        Like like = getLike(member, post, null);
+        LikePostDto likePostDto = new LikePostDto(member.getId(), post.getId());
 
         // When
-        likeRepository.saveLike(like);
+        likeRepository.savePostLike(likePostDto);
 
         // Then
-        assertNotNull(like.getId());
+        int postLikeCount = likeRepository.countLikeById(post.getId(), null);
+        assertEquals(1, postLikeCount);
     }
 
     @Test
@@ -49,36 +48,28 @@ class LikeRepositoryTest extends LikeRepositorySetUpTest {
     @DisplayName("댓글 좋아요 테스트")
     void saveCommentLike() {
         // Given
-        Like like = getLike(member, post, comment);
+        LikeCommentDto likeCommentDto = new LikeCommentDto(member.getId(), comment.getId());
 
         // When
-        likeRepository.saveLike(like);
+        likeRepository.saveCommentLike(likeCommentDto);
 
         // Then
-        assertNotNull(like.getId());
+        int countLikeCount = likeRepository.countLikeById(null, comment.getId());
+        assertEquals(1, countLikeCount);
     }
 
     @Test
     @DisplayName("댓글 총 좋아요 수 조회 테스트")
     void countCommentLikeById() {
         // Given
-        int beforeLikeCount = likeRepository.countLikeById(post.getId(), comment.getId());
+        int beforeLikeCount = likeRepository.countLikeById(null, comment.getId());
 
         // When
         saveCommentLike();
 
         // Then
-        int afterLikeCount = likeRepository.countLikeById(post.getId(), comment.getId());
+        int afterLikeCount = likeRepository.countLikeById(null, comment.getId());
         Assertions.assertThat(beforeLikeCount < afterLikeCount).isTrue();
     }
 
-
-    /**
-     * getLike, 좋아요 데이터 생성 유틸
-     *
-     * @return 좋아요 데이터
-     */
-    private Like getLike(Member member, Post post, Comment comment) {
-        return new Like(null, member.getId(), post.getId(), comment != null ? comment.getId() : null);
-    }
 }

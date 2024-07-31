@@ -13,9 +13,11 @@ public class CommentSaveForm {
     @NotNull
     private final String content;
 
-    private final int memberId;
+    @NotNull
+    private final Integer memberId;
 
-    private final int postId;
+    @NotNull
+    private final Integer postId;
 
     private final Integer parentId;
 
