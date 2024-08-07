@@ -46,6 +46,15 @@ jobs:
           source: project.jar
           target: /home/ubuntu/hello-blog-api-dev-server/tobe
 
+      - name: 키스토어 파일 SCP로 EC2에 전송하기
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: src/main/resources/keystore.jks
+          target: /home/ubuntu/hello-blog-api-dev-server/tobe
+
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:

@@ -40,4 +40,4 @@ out/
 *.properties
 
 ### 키스토어 외부에서 관리
-keystore.jks
+src/main/resources/keystore.jks
