@@ -27,6 +27,10 @@ jobs:
           mkdir -p src/test/resources
           echo "${{ secrets.APPLICATION_PROPERTIES_TEST }}" > src/test/resources/application.properties
 
+      - name: 키스토어 파일 디코딩 및 추가하기
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > src/main/resources/keystore.jks
+
       - name: 테스트 및 빌드하기
         run: ./gradlew clean build
 
@@ -56,6 +60,8 @@ jobs:
             mkdir /home/ubuntu/hello-blog-api-dev-server/current
             mv /home/ubuntu/hello-blog-api-dev-server/tobe/project.jar /home/ubuntu/hello-blog-api-dev-server/current/project.jar
             cd /home/ubuntu/hello-blog-api-dev-server/current
-            sudo fuser -k -n tcp 8080 || true
+            mv /home/ubuntu/hello-blog-api-dev-server/tobe/keystore.jks /home/ubuntu/hello-blog-api-dev-server/current/keystore.jks
+            cd /home/ubuntu/hello-blog-api-dev-server/current
+            sudo fuser -k -n tcp 8443 || true
             nohup java -jar project.jar > ./output.log 2>&1 &
             rm -rf /home/ubuntu/hello-blog-api-dev-server/tobe

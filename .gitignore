@@ -38,3 +38,6 @@ out/
 
 ### Application properties 외부에서 관리
 *.properties
+
+### 키스토어 외부에서 관리
+keystore.jks
