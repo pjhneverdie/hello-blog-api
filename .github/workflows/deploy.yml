@@ -23,13 +23,15 @@ jobs:
           mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
           echo "${{ secrets.APPLICATION_PROD_PROPERTIES }}" > src/main/resources/application-prod.properties
-          echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" > src/main/resources/application-test.properties
+          echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" > src/test/resources/application.properties
           mkdir -p src/test/resources
           echo "${{ secrets.APPLICATION_PROPERTIES_TEST }}" > src/test/resources/application.properties
 
       - name: 키스토어 파일 디코딩 및 추가하기
         run: |
+          mkdir -p src/main/resources
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > src/main/resources/keystore.jks
+          ls -l src/main/resources/keystore.jks
 
       - name: 테스트 및 빌드하기
         run: ./gradlew clean build
@@ -61,10 +63,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: project.jar
-          target: /home/ubuntu/hello-blog-api-dev-server/tobe
           script_stop: true
           script: |
+            ls -l /home/ubuntu/hello-blog-api-dev-server/tobe/keystore.jks
             rm -rf /home/ubuntu/hello-blog-api-dev-server/current
             mkdir /home/ubuntu/hello-blog-api-dev-server/current
             mv /home/ubuntu/hello-blog-api-dev-server/tobe/project.jar /home/ubuntu/hello-blog-api-dev-server/current/project.jar
