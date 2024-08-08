@@ -2,6 +2,7 @@ HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -38,7 +39,11 @@ out/
 .vscode/
 
 ### Application properties 외부에서 관리
-*.properties
+src/main/resources/application-prod.properties
+src/main/resources/application-test.properties
+src/main/resources/application.properties
+
+src/test/resources/application.properties
 
 ### 키스토어 외부에서 관리
 src/main/resources/keystore.p12
