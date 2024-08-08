@@ -16,6 +16,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+.DS_Store
 
 ### IntelliJ IDEA ###
 .idea
@@ -40,4 +41,4 @@ out/
 *.properties
 
 ### 키스토어 외부에서 관리
-src/main/resources/keystore.jks
+src/main/resources/keystore.p12
