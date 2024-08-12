@@ -11,8 +11,7 @@ import com.jj.hello_blog.web.member.form.MemberSignUpForm;
 import com.jj.hello_blog.web.common.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,15 +53,10 @@ public class MemberController {
         return ResponseEntity.ok(new ApiResponse<>(true));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Boolean>> deleteMember(HttpSession session, @PathVariable int id) {
         session.invalidate();
         return ResponseEntity.ok(new ApiResponse<>(memberService.deleteMember(id)));
-    }
-
-    @GetMapping("/{email}")
-    public ResponseEntity<ApiResponse<Boolean>> checkDuplicatedEmail(@Valid @NotNull @Email @PathVariable String email) {
-        return ResponseEntity.ok(new ApiResponse<>(memberService.checkDuplicatedEmail(email)));
     }
 
 }

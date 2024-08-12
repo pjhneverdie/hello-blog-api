@@ -15,7 +15,7 @@ public enum LikeExceptionCode implements ExceptionCode {
     }
 
     @Override
-    public String message() {
+    public String code() {
         return this.message;
     }
 

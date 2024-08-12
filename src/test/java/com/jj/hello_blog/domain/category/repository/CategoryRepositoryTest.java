@@ -1,18 +1,17 @@
 package com.jj.hello_blog.domain.category.repository;
 
-import com.jj.hello_blog.domain.category.dto.Category;
-import com.jj.hello_blog.domain.category.dto.CategoryUpdateDto;
-import com.jj.hello_blog.domain.post.dto.Post;
-import com.jj.hello_blog.domain.post.repository.PostRepository;
-import com.jj.hello_blog.domain.post.repository.PostRepositoryTest;
-import com.jj.hello_blog.domain.category.dto.CategoryResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+
+import com.jj.hello_blog.domain.category.dto.Category;
+import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateQueryDto;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,81 +22,92 @@ public class CategoryRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private PostRepository postRepository;
-
     @Test
     @DisplayName("카테고리 추가 테스트")
-    void saveCategory() {
+    void insertCategory() {
         // Given
-        Category category = getCategory();
+        Category category = createCategory(null, "thumbUrl", "test", null);
 
         // When
-        categoryRepository.saveCategory(category);
+        categoryRepository.insertCategory(category);
 
         // Then
         assertNotNull(category.getId());
     }
 
     @Test
-    @DisplayName("카테고리 수정 테스트")
-    void updateCategory() {
+    @DisplayName("하위 카테고리 조회 테스트")
+    void selectCategoriesByParentId() {
         // Given
-        Category category = getCategory();
-        categoryRepository.saveCategory(category);
+        Category parent = createCategory(null, "thumbUrl", "parent", null);
+        categoryRepository.insertCategory(parent);
+
+        Category child = createCategory(null, "thumbUrl", "child", parent.getId());
+        categoryRepository.insertCategory(child);
 
         // When
-        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(category.getId(), category.getName() + "update");
-        categoryRepository.updateCategory(categoryUpdateDto);
+        List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesByParentId(parent.getId());
 
         // Then
-        List<CategoryResponse> categories = categoryRepository.findAllCategories();
+        categoryResponses.get(0).getId().equals(parent.getId());
+        categoryResponses.get(1).getId().equals(child.getId());
+    }
+
+    @Test
+    @DisplayName("최상위 카테고리 조회 테스트")
+    void selectCategoriesWhereParentIdIsNull() {
+        // Given
+        Category parent = createCategory(null, "thumbUrl", "parent", null);
+        categoryRepository.insertCategory(parent);
+
+        // When
+        List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesWhereParentIdIsNull();
+
+        // Then
+        categoryResponses.get(0).getId().equals(parent.getId());
+    }
+
+    @Test
+    @DisplayName("카테고리 수정 테스트")
+    void updateCategoryById() {
+        // Given
+        Category category = createCategory(null, "thumbUrl", "test", null);
+        categoryRepository.insertCategory(category);
+
+        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(category.getId(), category.getThumbUrl(), category.getName() + "update", category.getParentId());
+
+        // When
+        categoryRepository.updateCategoryById(categoryUpdateQueryDto);
+
+        // Then
+        List<CategoryResponse> categories = categoryRepository.selectCategoriesWhereParentIdIsNull();
+
         categories.forEach((categoryResponse) -> {
-            assertEquals(categoryResponse.getId(), categoryUpdateDto.getId());
+            assertEquals(categoryResponse.getId(), categoryUpdateQueryDto.getId());
             assertEquals(categoryResponse.getId(), (int) category.getId());
         });
     }
 
     @Test
     @DisplayName("카테고리 삭제 테스트")
-    void deleteCategory() {
+    void deleteCategoryById() {
         // Given
-        Category category = getCategory();
-        categoryRepository.saveCategory(category);
+        Category category = createCategory(null, "thumbUrl", "parent", null);
+        categoryRepository.insertCategory(category);
 
         // When
-        categoryRepository.deleteCategory(category.getId());
+        categoryRepository.deleteCategoryById(category.getId());
 
         // Then
-        List<CategoryResponse> categories = categoryRepository.findAllCategories();
+        List<CategoryResponse> categories = categoryRepository.selectCategoriesWhereParentIdIsNull();
         assertTrue(categories.isEmpty());
     }
 
-    @Test
-    @DisplayName("카테고리 조회 테스트")
-    void findAllCategories() {
-        // Given
-        Category category = getCategory();
-        categoryRepository.saveCategory(category);
-
-        Post postInCategory = PostRepositoryTest.getPost(category);
-        postRepository.savePost(postInCategory);
-
-        // When
-        List<CategoryResponse> categories = categoryRepository.findAllCategories();
-
-        // Then
-        categories.forEach((categoryResponse) -> {
-            assertEquals(categoryResponse.getId(), (int) category.getId());
-            assertTrue(categoryResponse.getPosts().stream().allMatch(post -> postInCategory.getId().equals(post.getId())));
-        });
-    }
-
     /**
-     * getCategory, 카테고리 데이터 생성 유틸
+     * createCategory, 카테고리 데이터 생성 유틸
      */
-    public static Category getCategory() {
-        return new Category(null, "test");
+    public static Category createCategory(Integer id, String thumbUrl, String name, Integer parentId) {
+        return new Category(id, thumbUrl, name, parentId);
     }
 
 }

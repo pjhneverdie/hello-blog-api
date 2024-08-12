@@ -1,19 +1,18 @@
 package com.jj.hello_blog.domain.category.service;
 
-import com.jj.hello_blog.domain.category.dto.Category;
-import com.jj.hello_blog.domain.category.dto.CategorySaveDto;
-import com.jj.hello_blog.domain.category.dto.CategoryUpdateDto;
-import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.dao.DuplicateKeyException;
+
+import com.jj.hello_blog.domain.category.dto.*;
 import com.jj.hello_blog.domain.category.repository.CategoryRepository;
-import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
 
 import com.jj.hello_blog.domain.common.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
+import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 
 @Service
@@ -21,17 +20,25 @@ import java.util.*;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final S3BucketService s3BucketService;
+
+    private static final String DEFAULT_THUMB_URL = "";
 
     /**
-     * saveCategory, 카테고리 추가
+     * addCategory, 카테고리 추가
      */
-    public CategoryResponse saveCategory(CategorySaveDto categorySaveDto) {
+    public CategoryResponse addCategory(CategoryAddDto categoryAddDto) {
         try {
-            Category category = new Category(null, categorySaveDto.getName());
+            String thumbUrl = uploadThumbImage(categoryAddDto.getThumbImageFile());
 
-            categoryRepository.saveCategory(category);
+            Category category = new Category(null, thumbUrl, categoryAddDto.getName(), categoryAddDto.getParentId());
 
-            return new CategoryResponse(category.getId(), category.getName(), new ArrayList<>());
+            categoryRepository.insertCategory(category);
+
+            return new CategoryResponse(
+                    category.getId(), category.getThumbUrl(),
+                    category.getName(), 0);
+
         } catch (DuplicateKeyException e) {
             // 카테고리 이름 중복 시
             throw new CustomException(CategoryExceptionCode.DUPLICATED_CATEGORY);
@@ -39,18 +46,59 @@ public class CategoryService {
     }
 
     /**
+     * findCategories, 최상위 카테고리 조회
+     */
+    public List<CategoryResponse> findCategories() {
+        return categoryRepository.selectCategoriesWhereParentIdIsNull();
+    }
+
+    /**
+     * findCategories, 하위 카테고리 조회
+     */
+    public List<CategoryResponse> findCategories(int parentId) {
+        return categoryRepository.selectCategoriesByParentId(parentId);
+    }
+
+    /**
      * updateCategory, 카테고리 수정
      */
     public boolean updateCategory(CategoryUpdateDto categoryUpdateDto) {
-        categoryRepository.updateCategory(categoryUpdateDto);
+        String thumbUrl = uploadThumbImage(categoryUpdateDto.getThumbImageFile());
+
+
+        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(
+                categoryUpdateDto.getId(),
+                thumbUrl,
+                categoryUpdateDto.getName(),
+                categoryUpdateDto.getParentId()
+        );
+
+        categoryRepository.updateCategoryById(categoryUpdateQueryDto);
+
         return true;
     }
 
     /**
-     * getCategories, 카테고리 조회
+     * deleteCategory, 카테고리 삭제
      */
-    public List<CategoryResponse> findAllCategories() {
-        return categoryRepository.findAllCategories();
+    public boolean deleteCategory(int id) {
+        categoryRepository.deleteCategoryById(id);
+
+        return true;
     }
 
+    /**
+     * uploadThumbImage, 썸네일 업로드 공통 메서드
+     */
+    private String uploadThumbImage(MultipartFile thumbImageFile) {
+        String thumbUrl;
+
+        if (thumbImageFile == null) {
+            thumbUrl = DEFAULT_THUMB_URL;
+        } else {
+            thumbUrl = s3BucketService.putS3Object(thumbImageFile);
+        }
+
+        return thumbUrl;
+    }
 }

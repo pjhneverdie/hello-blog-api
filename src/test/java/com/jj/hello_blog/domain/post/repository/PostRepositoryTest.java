@@ -21,12 +21,12 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
 
     @Test
     @DisplayName("게시글 작성 테스트")
-    void savePost() {
+    void insertPost() {
         // Given
         Post post = getPost(category);
 
         // When
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
         // Then
         assertNotNull(post.getId());
@@ -37,7 +37,7 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
     void updatePost() {
         // Given
         Post post = getPost(category);
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
 
         // When
@@ -56,10 +56,10 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
 
     @Test
     @DisplayName("게시글 삭제 테스트")
-    void deleteSavePostById() {
+    void deleteInsertPostById() {
         // Given
         Post post = getPost(category);
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
         // When
         postRepository.deletePost(post.getId());
@@ -71,10 +71,10 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
 
     @Test
     @DisplayName("id로 게시글 단건 조회 테스트")
-    void findSavePostById() {
+    void findInsertPostById() {
         // Given
         Post post = getPost(category);
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
         // When
         Optional<Post> optionalPost = postRepository.findPostById(post.getId());
@@ -85,10 +85,10 @@ public class PostRepositoryTest extends PostRepositoryTestSetUp {
 
     @Test
     @DisplayName("카테고리에 속한 게시글 수 조회 테스트")
-    void countSavePostByCategoryId() {
+    void countInsertPostByCategoryId() {
         // Given
         Post post = getPost(category);
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
         // When
         int postCount = postRepository.countPostByCategoryId(category.getId());

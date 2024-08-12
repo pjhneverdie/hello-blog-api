@@ -1,18 +1,18 @@
 package com.jj.hello_blog.web.category.form;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Set;
+
+import jakarta.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CategorySaveFormTest {
+class CategoryAddFormTest {
     private Validator validator;
 
     @BeforeEach
@@ -23,15 +23,15 @@ class CategorySaveFormTest {
 
     @Test
     void validateName() {
-        CategorySaveForm categorySaveFormNullName = new CategorySaveForm(null);
-        CategorySaveForm categorySaveFormBlankName = new CategorySaveForm(" ");
+        CategoryAddForm categoryAddFormNullName = new CategoryAddForm(null, 1);
+        CategoryAddForm categoryAddFormBlankName = new CategoryAddForm(" ", 1);
 
         // null
-        Set<ConstraintViolation<CategorySaveForm>> constraintViolations = validator.validate(categorySaveFormNullName);
+        Set<ConstraintViolation<CategoryAddForm>> constraintViolations = validator.validate(categoryAddFormNullName);
         assertFalse(constraintViolations.isEmpty());
 
         // empty
-        constraintViolations = validator.validate(categorySaveFormBlankName);
+        constraintViolations = validator.validate(categoryAddFormBlankName);
         assertFalse(constraintViolations.isEmpty());
     }
 

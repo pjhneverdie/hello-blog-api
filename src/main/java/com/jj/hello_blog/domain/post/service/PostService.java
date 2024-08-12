@@ -27,7 +27,7 @@ public class PostService {
         Post post = new Post(null, postSaveDto.getTitle(),
                 postSaveDto.getContent(), null, null, postSaveDto.getCategoryId());
 
-        postRepository.savePost(post);
+        postRepository.insertPost(post);
 
         // createdAt, fixedAt 받아오기
         post = findPostById(post.getId());
@@ -60,7 +60,7 @@ public class PostService {
 
         // 해당 게시글이, 게시글이 속한 카테고리의 마지막 글이면 게시글도 삭제
         if (countPostByCategoryId(categoryId) == 0) {
-            categoryRepository.deleteCategory(categoryId);
+            categoryRepository.deleteCategoryById(categoryId);
         }
 
         return true;

@@ -1,7 +1,5 @@
 package com.jj.hello_blog.web.member.controller;
 
-import com.jj.hello_blog.domain.category.dto.CategorySaveDto;
-import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
 import com.jj.hello_blog.domain.common.exception.CustomException;
 import com.jj.hello_blog.domain.member.dto.Member;
 import com.jj.hello_blog.domain.member.dto.MemberResponse;
@@ -31,7 +29,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MemberController.class)
@@ -47,8 +44,8 @@ class MemberControllerTest extends ControllerTestBase {
     @DisplayName("멤버 정보 조회 테스트")
     public void me() throws Exception {
         // Given
-        Member member = getMember();
-        MockHttpSession session = getMockHttpSessionWithMember(member);
+        Member member = createMember("test@test.com", "123456");
+        MockHttpSession session = createMockHttpSessionWithMember(member);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/member/me").session(session));
@@ -67,7 +64,7 @@ class MemberControllerTest extends ControllerTestBase {
         // Given
         MemberSignInForm memberSignInForm = new MemberSignInForm("test@test.com", "123456");
 
-        Member member = new Member(1, memberSignInForm.getEmail(), memberSignInForm.getPassword());
+        Member member = createMember(memberSignInForm.getEmail(), memberSignInForm.getPassword());
 
         when(memberService.signIn(any(MemberSignInDto.class))).thenReturn(member);
 
@@ -109,10 +106,10 @@ class MemberControllerTest extends ControllerTestBase {
 
         // Then
         ApiResponse<Void> response = new ApiResponse<>(null);
-        response.setMessage(MemberExceptionCode.SIGN_IN_FAILED.message());
+        response.setExceptionCode(MemberExceptionCode.SIGN_IN_FAILED.code());
 
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().is4xxClientError())
                 .andExpect(content().json(toJson(response)));
     }
 
@@ -122,7 +119,7 @@ class MemberControllerTest extends ControllerTestBase {
         // Given
         MemberSignUpForm memberSignUpForm = new MemberSignUpForm("test@test.com", "123456");
 
-        Member member = new Member(1, memberSignUpForm.getEmail(), memberSignUpForm.getPassword());
+        Member member = createMember(memberSignUpForm.getEmail(), memberSignUpForm.getPassword());
 
         when(memberService.signUp(any(MemberSignUpDto.class))).thenReturn(member);
 
@@ -145,11 +142,38 @@ class MemberControllerTest extends ControllerTestBase {
     }
 
     @Test
+    @DisplayName("회원가입 실패 테스트")
+    public void signUpWithDuplicatedEmail() throws Exception {
+        // Given
+        MemberSignUpForm memberSignUpForm = new MemberSignUpForm("test@test.com", "123456");
+
+        doThrow(new CustomException(MemberExceptionCode.DUPLICATED_EMAIL))
+                .when(memberService)
+                .signUp(any(MemberSignUpDto.class));
+
+        MockHttpSession session = new MockHttpSession();
+
+        // When
+        ResultActions resultActions = mockMvc.perform(post("/member/signUp")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(memberSignUpForm))
+                .session(session));
+
+        // Then
+        ApiResponse<Void> response = new ApiResponse<>(null);
+        response.setExceptionCode(MemberExceptionCode.DUPLICATED_EMAIL.code());
+
+        resultActions
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().json(toJson(response)));
+    }
+
+    @Test
     @DisplayName("로그아웃 테스트")
     public void signOut() throws Exception {
         // Given
-        Member member = getMember();
-        MockHttpSession session = getMockHttpSessionWithMember(member);
+        Member member = createMember("test@test.com", "123456");
+        MockHttpSession session = createMockHttpSessionWithMember(member);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/member/signOut").session(session));
@@ -166,30 +190,13 @@ class MemberControllerTest extends ControllerTestBase {
     @DisplayName("회원탈퇴 테스트")
     public void deleteMember() throws Exception {
         // Given
-        Member member = getMember();
-        MockHttpSession session = getMockHttpSessionWithMember(member);
+        Member member = createMember("test@test.com", "123456");
+        MockHttpSession session = createMockHttpSessionWithMember(member);
 
         when(memberService.deleteMember(any(int.class))).thenReturn(true);
 
         // When
-        ResultActions resultActions = mockMvc.perform(delete("/member/delete/" + member.getId()).session(session));
-
-        // Then
-        ApiResponse<Boolean> response = new ApiResponse<>(true);
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
-    }
-
-    @Test
-    @DisplayName("이메일 중복 확인 테스트")
-    public void checkDuplicatedEmail() throws Exception {
-        // Given
-        when(memberService.checkDuplicatedEmail(any(String.class))).thenReturn(true);
-
-        // When
-        ResultActions resultActions = mockMvc.perform(get("/member/test@test.com"));
+        ResultActions resultActions = mockMvc.perform(delete("/member/" + member.getId().toString()).session(session));
 
         // Then
         ApiResponse<Boolean> response = new ApiResponse<>(true);
@@ -200,16 +207,16 @@ class MemberControllerTest extends ControllerTestBase {
     }
 
     /**
-     * getMember, 멤버 데이터 생성 유틸
+     * createMember, 멤버 데이터 생성 유틸
      */
-    private Member getMember() {
-        return new Member(1, "test@test.com", "123456");
+    private Member createMember(String email, String password) {
+        return new Member(1, email, password);
     }
 
     /**
-     * getMockHttpSessionWithMember, 멤버 세션 생성 유틸
+     * createMockHttpSessionWithMember, 멤버 세션 생성 유틸
      */
-    private MockHttpSession getMockHttpSessionWithMember(Member member) {
+    private MockHttpSession createMockHttpSessionWithMember(Member member) {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute(SessionConst.MEMBER_KEY, member);
         return session;

@@ -9,6 +9,10 @@ public class Category {
 
     private final Integer id;
 
+    private final String thumbUrl;
+
     private final String name;
+
+    private final Integer parentId;
 
 }

@@ -1,6 +1,5 @@
 package com.jj.hello_blog.web.common.response;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +7,7 @@ import lombok.Setter;
 public class ApiResponse<T> {
 
     @Setter
-    private String message = "ok";
+    private String exceptionCode = "none";
 
     private final T value;
 

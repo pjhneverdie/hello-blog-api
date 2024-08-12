@@ -46,14 +46,14 @@ public class LikeRepositoryTestSetUp {
     @BeforeEach
     @DisplayName("좋아요를 누를 게시글, 댓글 셋업")
     void setUp() {
-        this.member = MemberRepositoryTest.getMember();
-        memberRepository.saveMember(member);
+        this.member = MemberRepositoryTest.createMember();
+        memberRepository.insertMember(member);
 
-        this.category = CategoryRepositoryTest.getCategory();
-        categoryRepository.saveCategory(category);
+        this.category = CategoryRepositoryTest.createCategory(null, "thumbUrl", "test", null);
+        categoryRepository.insertCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);
-        postRepository.savePost(this.post);
+        postRepository.insertPost(this.post);
 
         this.comment = CommentRepositoryTest.getComment(this.member, this.post);
         commentRepository.saveComment(this.comment);

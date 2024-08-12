@@ -6,10 +6,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MemberMapper {
 
-    void saveMember(Member member);
+    void insertMember(Member member);
 
-    void deleteMember(int id);
+    void deleteMemberById(int id);
 
-    Member findMemberByEmail(String email);
+    Member selectMemberByEmail(String email);
 
 }

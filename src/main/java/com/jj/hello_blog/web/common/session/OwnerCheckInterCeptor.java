@@ -14,12 +14,12 @@ public class OwnerCheckInterCeptor extends SessionInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        // 카테고리 GET 요청은 인터셉터를 거치지 않도록 함
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/category")) {
+        if (ownerPassword.equals("test")) {
             return true;
         }
 
-        if (ownerPassword.equals("test")) {
+        // 카테고리 GET 요청은 인터셉터를 거치지 않도록 함
+        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/category")) {
             return true;
         }
 

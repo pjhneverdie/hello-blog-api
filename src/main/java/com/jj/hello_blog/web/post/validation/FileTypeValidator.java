@@ -24,8 +24,8 @@ public class FileTypeValidator implements ConstraintValidator<FileTypeConstraint
 
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext constraintValidatorContext) {
-        if (file == null || file.isEmpty()) {
-            return false;
+        if (file == null) {
+            return true;
         }
 
         String originalFilename = file.getOriginalFilename();

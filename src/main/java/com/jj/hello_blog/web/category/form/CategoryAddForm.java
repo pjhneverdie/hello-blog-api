@@ -1,16 +1,13 @@
 package com.jj.hello_blog.web.category.form;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+
+import lombok.*;
 
 @Getter
 @RequiredArgsConstructor
-public class CategoryUpdateForm {
-
-    @NotNull
-    private final Integer id;
+public class CategoryAddForm {
 
     @NotBlank
     @NotNull

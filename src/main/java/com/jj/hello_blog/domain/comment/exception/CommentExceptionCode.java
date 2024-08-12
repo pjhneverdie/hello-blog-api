@@ -15,7 +15,7 @@ public enum CommentExceptionCode implements ExceptionCode {
     }
 
     @Override
-    public String message() {
+    public String code() {
         return this.message;
     }
 

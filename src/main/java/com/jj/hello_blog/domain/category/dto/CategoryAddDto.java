@@ -7,9 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @RequiredArgsConstructor
-public class CategoryUpdateDto {
-
-    private final int id;
+public class CategoryAddDto {
 
     private final MultipartFile thumbImageFile;
 

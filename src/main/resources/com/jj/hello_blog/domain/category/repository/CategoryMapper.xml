@@ -4,63 +4,93 @@
 <mapper namespace="com.jj.hello_blog.domain.category.repository.CategoryMapper">
 
     <resultMap id="CategoryResponseMap" type="CategoryResponse">
-        <id property="id" column="categoryId"/>
-        <result property="name" column="categoryName"/>
-        <collection property="posts" ofType="PostResponse">
-            <id property="id" column="postId"/>
-            <result property="title" column="title"/>
-            <result property="content" column="content"/>
-            <result property="createdAt" column="createdAt"/>
-            <result property="fixedAt" column="fixedAt"/>
-            <result property="categoryId" column="postCategoryId"/>
-            <result property="likeCount" column="likeCount"/>
-            <result property="commentCount" column="commentCount"/>
-        </collection>
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="postCount" column="postCount"/>
     </resultMap>
 
-    <insert id="saveCategory" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO category(name)
-        VALUES (#{name})
+    <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category(thumb_url, name, parent_id)
+        VALUES (#{thumbUrl}, #{name}, #{parentId})
     </insert>
 
-    <update id="updateCategory">
+    <select id="selectCategoriesWhereParentIdIsNull" resultMap="CategoryResponseMap">
+        WITH RECURSIVE CategoryHierarchy AS (
+        <!-- 최상위 카테고리 선택 -->
+        SELECT id AS category_id,
+        id AS top_category_id,
+        parent_id
+        FROM category
+        WHERE parent_id IS NULL
+
+        UNION ALL
+
+        <!-- 하위 카테고리 선택 (재귀)
+        category_id는 자기 꺼, top_category_id 자기의 최상위 카테고리 id -->
+        SELECT c.id AS category_id,
+        ch.top_category_id,
+        c.parent_id
+        FROM category c
+        INNER JOIN
+        CategoryHierarchy ch ON c.parent_id = ch.category_id)
+
+        SELECT ch.top_category_id AS id,
+        c.thumb_url AS thumbUrl,
+        c.name AS name,
+        COUNT(p.id) AS postCount
+        FROM CategoryHierarchy ch
+        <!-- INNER JOIN 전 ch 테이블: cid | tid | pid -->
+        INNER JOIN
+        category c ON c.id = ch.top_category_id
+        <!-- INNER JOIN 후 ch 테이블: cid | tid | pid | ..top_category_id의 컬럼들 -->
+        <!-- 부모 자식 조인이 아니라 컬럼 뻥튀기 안 됨 -->
+
+        <!-- LEFT JOIN 전 ch 테이블: cid | tid | pid | ..top_category_id의 컬럼들 -->
+        LEFT JOIN
+        post p ON p.category_id = ch.category_id
+        <!-- LEFT JOIN 후 | ch 테이블: cid | tid | pid | ..top_category_id의 컬럼들 | 각 카테고리에 게시된 글의 컬럼들 -->
+        <!-- 카테고리와 게시글은 일대다 관계라 여기서 부터는 컬럼이 늘어남 -->
+
+        <!-- 그룹으로 묶으면 최상위 카테고리에 몇 개의 게시글이 있는지 조회할 수 있음 -->
+        GROUP BY ch.top_category_id, c.thumb_url, c.name
+        ORDER BY ch.top_category_id;
+    </select>
+
+    <select id="selectCategoriesByParentId" resultMap="CategoryResponseMap">
+        WITH RECURSIVE CategoryHierarchy AS (SELECT id,
+                                                    thumb_url,
+                                                    name,
+                                                    parent_id
+                                             FROM category
+                                             WHERE id = #{parentId}
+                                             UNION ALL
+                                             SELECT c.id,
+                                                    c.thumb_url,
+                                                    c.name,
+                                                    c.parent_id
+                                             FROM category c
+                                                      INNER JOIN
+                                                  CategoryHierarchy ch ON c.parent_id = ch.id)
+        SELECT ch.id                   AS id,
+               ch.thumb_url            AS thumbUrl,
+               ch.name                 AS name,
+               IFNULL(p.post_count, 0) AS postCount
+        FROM CategoryHierarchy ch
+                 LEFT JOIN (SELECT category_id,
+                                   COUNT(*) AS post_count
+                            FROM post
+                            GROUP BY category_id) p ON ch.id = p.category_id
+    </select>
+
+    <update id="updateCategoryById">
         UPDATE category
-        SET name = #{name}
+        SET thumb_url = #{thumbUrl},
+            name      = #{name},
+            parent_id = #{parentId}
         WHERE id = #{id}
     </update>
 
-    <select id="findAllCategories" resultMap="CategoryResponseMap">
-        SELECT c.id                         AS categoryId,
-               c.name                       AS categoryName,
-               p.id                         AS postId,
-               p.title,
-               p.content,
-               p.created_at                 AS createdAt,
-               p.fixed_at                   AS fixedAt,
-               p.category_id                AS postCategoryId,
-               COALESCE(l.likeCount, 0)     AS likeCount,
-               COALESCE(cm.commentCount, 0) AS commentCount
-        FROM category c
-                 JOIN (SELECT id,
-                              title,
-                              content,
-                              created_at,
-                              fixed_at,
-                              category_id,
-                              ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY created_at DESC) AS rn
-                       FROM post) p ON c.id = p.category_id AND <![CDATA[p.rn <= 5]]>
-                 LEFT JOIN (SELECT post_id,
-                                   COUNT(*) AS likeCount
-                            FROM `like`
-                            GROUP BY post_id) l ON p.id = l.post_id
-                 LEFT JOIN (SELECT post_id,
-                                   COUNT(*) AS commentCount
-                            FROM comment
-                            GROUP BY post_id) cm ON p.id = cm.post_id
-        ORDER BY c.id, p.created_at DESC;
-    </select>
-
-    <delete id="deleteCategory">
+    <delete id="deleteCategoryById">
         DELETE
         FROM category
         WHERE id = #{id};

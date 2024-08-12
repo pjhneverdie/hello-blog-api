@@ -3,18 +3,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jj.hello_blog.domain.member.repository.MemberMapper">
 
-    <insert id="saveMember" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertMember" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO member(email, password)
         VALUES (#{email}, #{password})
     </insert>
 
-    <delete id="deleteMember">
+    <delete id="deleteMemberById">
         DELETE
         FROM member
         WHERE id = #{id}
     </delete>
 
-    <select id="findMemberByEmail" resultType="Member">
+    <select id="selectMemberByEmail" resultType="Member">
         SELECT id, email, password
         FROM member
         WHERE email = #{email}

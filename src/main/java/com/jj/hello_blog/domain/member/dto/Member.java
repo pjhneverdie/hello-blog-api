@@ -1,7 +1,7 @@
 package com.jj.hello_blog.domain.member.dto;
 
-import lombok.RequiredArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor

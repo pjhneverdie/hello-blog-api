@@ -12,16 +12,16 @@ public class MemberRepository {
 
     private final MemberMapper memberMapper;
 
-    public void saveMember(Member member) {
-        memberMapper.saveMember(member);
+    public void insertMember(Member member) {
+        memberMapper.insertMember(member);
     }
 
-    public void deleteMember(int id) {
-        memberMapper.deleteMember(id);
+    public void deleteMemberById(int id) {
+        memberMapper.deleteMemberById(id);
     }
 
-    public Optional<Member> findMemberByEmail(String email) {
-        return Optional.ofNullable(memberMapper.findMemberByEmail(email));
+    public Optional<Member> selectMemberByEmail(String email) {
+        return Optional.ofNullable(memberMapper.selectMemberByEmail(email));
     }
 
 }

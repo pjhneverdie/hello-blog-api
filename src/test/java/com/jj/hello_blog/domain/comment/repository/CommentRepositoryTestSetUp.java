@@ -38,14 +38,14 @@ public class CommentRepositoryTestSetUp {
     @BeforeEach
     @DisplayName("댓글 테스트 셋업")
     void setUp() {
-        this.member = MemberRepositoryTest.getMember();
-        memberRepository.saveMember(member);
+        this.member = MemberRepositoryTest.createMember();
+        memberRepository.insertMember(member);
 
-        this.category = CategoryRepositoryTest.getCategory();
-        categoryRepository.saveCategory(category);
+        this.category = CategoryRepositoryTest.createCategory(null, "thumbUrl", "test", null);
+        categoryRepository.insertCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);
-        postRepository.savePost(this.post);
+        postRepository.insertPost(this.post);
     }
 
     @Test

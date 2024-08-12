@@ -1,17 +1,17 @@
 package com.jj.hello_blog.domain.member.repository;
 
-import com.jj.hello_blog.domain.member.dto.Member;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.jj.hello_blog.domain.member.dto.Member;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -22,12 +22,12 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("회원가입 테스트")
-    void saveMember() {
+    void insertMember() {
         // Given
-        Member member = getMember();
+        Member member = createMember();
 
         // When
-        memberRepository.saveMember(member);
+        memberRepository.insertMember(member);
 
         // Then
         assertNotNull(member.getId());
@@ -35,38 +35,38 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("회원탈퇴 테스트")
-    void deleteMember() {
+    void deleteMemberById() {
         // Given
-        Member member = getMember();
-        memberRepository.saveMember(member);
+        Member member = createMember();
+        memberRepository.insertMember(member);
 
         // When
-        memberRepository.deleteMember(member.getId());
+        memberRepository.deleteMemberById(member.getId());
 
         // Then
-        Optional<Member> existMember = memberRepository.findMemberByEmail(member.getEmail());
-        assertFalse(existMember.isPresent());
+        Optional<Member> foundMember = memberRepository.selectMemberByEmail(member.getEmail());
+        assertFalse(foundMember.isPresent());
     }
 
 
     @Test
     @DisplayName("이메일로 멤버 조회 테스트")
-    void findMemberByEmail() {
+    void selectMemberByEmail() {
         // Given
-        Member member = getMember();
-        memberRepository.saveMember(member);
+        Member member = createMember();
+        memberRepository.insertMember(member);
 
         // When
-        Optional<Member> existMember = memberRepository.findMemberByEmail(member.getEmail());
+        Optional<Member> foundMember = memberRepository.selectMemberByEmail(member.getEmail());
 
         // Then
-        Assertions.assertThat(existMember.get().getId().equals(member.getId())).isTrue();
+        assertEquals(foundMember.get().getId(), member.getId());
     }
 
     /**
-     * getMember, 멤버 데이터 생성 유틸
+     * createMember, 멤버 데이터 생성 유틸
      */
-    public static Member getMember() {
+    public static Member createMember() {
         return new Member(null, "test@test.com", "123456");
     }
 

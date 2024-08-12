@@ -14,7 +14,7 @@ public class PostRepository {
 
     private final PostMapper postMapper;
 
-    public void savePost(Post post) {
+    public void insertPost(Post post) {
         postMapper.savePost(post);
     }
 

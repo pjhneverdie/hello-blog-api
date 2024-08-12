@@ -1,13 +1,14 @@
 package com.jj.hello_blog.web.category.form;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Set;
+
+import jakarta.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +23,7 @@ class CategoryUpdateFormTest {
 
     @Test
     void validateId() {
-        CategoryUpdateForm categoryUpdateFormNullId = new CategoryUpdateForm(null, "test");
+        CategoryUpdateForm categoryUpdateFormNullId = new CategoryUpdateForm(null, "test", 1);
 
         Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullId);
         assertFalse(constraintViolations.isEmpty());
@@ -30,8 +31,8 @@ class CategoryUpdateFormTest {
 
     @Test
     void validateName() {
-        CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null);
-        CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ");
+        CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null, 1);
+        CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ", 1);
 
         // null
         Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullName);

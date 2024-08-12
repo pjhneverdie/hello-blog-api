@@ -22,8 +22,8 @@ public class PostRepositoryTestSetUp {
     @BeforeEach
     @DisplayName("게시글을 작성할 카테고리 셋업")
     void setUp() {
-        this.category = CategoryRepositoryTest.getCategory();
-        categoryRepository.saveCategory(category);
+        this.category = CategoryRepositoryTest.createCategory(null, "thumbUrl", "test", null);
+        categoryRepository.insertCategory(category);
     }
 
     @Test

@@ -5,8 +5,14 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class CategorySaveDto {
+public class CategoryUpdateQueryDto {
+
+    private final int id;
+
+    private final String thumbUrl;
 
     private final String name;
+
+    private final Integer parentId;
 
 }

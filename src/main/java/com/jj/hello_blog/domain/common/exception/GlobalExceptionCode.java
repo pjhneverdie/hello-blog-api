@@ -1,6 +1,7 @@
 package com.jj.hello_blog.domain.common.exception;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
@@ -15,12 +16,12 @@ public enum GlobalExceptionCode implements ExceptionCode {
     }
 
     @Override
-    public String message() {
-        return this.processingCode;
+    public String code() {
+        return this.code;
     }
 
     private final HttpStatus httpStatus;
 
-    private final String processingCode;
+    private final String code;
 
 }

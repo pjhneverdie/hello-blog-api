@@ -22,7 +22,7 @@ public class MemberService {
      * signIn, 로그인
      */
     public Member signIn(MemberSignInDto memberSignInDto) {
-        Optional<Member> member = memberRepository.findMemberByEmail(memberSignInDto.getEmail());
+        Optional<Member> member = memberRepository.selectMemberByEmail(memberSignInDto.getEmail());
 
         if (member.isPresent() && member.get().getPassword().equals(memberSignInDto.getPassword())) {
             return member.get();
@@ -38,7 +38,7 @@ public class MemberService {
         try {
             Member member = new Member(null, memberSignUpDto.getEmail(), memberSignUpDto.getPassword());
 
-            memberRepository.saveMember(member);
+            memberRepository.insertMember(member);
 
             return member;
         } catch (DuplicateKeyException e) {
@@ -51,15 +51,8 @@ public class MemberService {
      * signOut, 회원탈퇴
      */
     public boolean deleteMember(int id) {
-        memberRepository.deleteMember(id);
+        memberRepository.deleteMemberById(id);
         return true;
-    }
-
-    /**
-     * checkDuplicatedEmail, 회원가입 전 중복 이메일 확인
-     */
-    public boolean checkDuplicatedEmail(String email) {
-        return memberRepository.findMemberByEmail(email).isPresent();
     }
 
 }
