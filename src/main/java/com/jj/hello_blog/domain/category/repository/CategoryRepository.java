@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.category.repository;
 
 import java.util.List;
 
+import com.jj.hello_blog.domain.category.dto.CategoryHierarchy;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
@@ -26,6 +27,10 @@ public class CategoryRepository {
 
     public void deleteCategoryById(int id) {
         categoryMapper.deleteCategoryById(id);
+    }
+
+    public List<CategoryHierarchy> selectCategoryHierarchy() {
+        return categoryMapper.selectCategoryHierarchy();
     }
 
     public List<CategoryResponse> selectCategoriesWhereParentIdIsNull() {

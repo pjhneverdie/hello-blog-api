@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.category.repository;
 
 import java.util.List;
 
+import com.jj.hello_blog.domain.category.dto.CategoryHierarchy;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.jj.hello_blog.domain.category.dto.Category;
@@ -16,6 +17,8 @@ public interface CategoryMapper {
     void updateCategoryById(CategoryUpdateQueryDto categoryUpdateQueryDto);
 
     void deleteCategoryById(int id);
+
+    List<CategoryHierarchy> selectCategoryHierarchy();
 
     List<CategoryResponse> selectCategoriesWhereParentIdIsNull();
 

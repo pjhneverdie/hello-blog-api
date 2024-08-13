@@ -3,6 +3,7 @@ package com.jj.hello_blog.domain.category.repository;
 import java.util.List;
 
 import com.jj.hello_blog.domain.category.dto.Category;
+import com.jj.hello_blog.domain.category.dto.CategoryHierarchy;
 import com.jj.hello_blog.domain.category.dto.CategoryResponse;
 import com.jj.hello_blog.domain.category.dto.CategoryUpdateQueryDto;
 
@@ -33,6 +34,32 @@ public class CategoryRepositoryTest {
 
         // Then
         assertNotNull(category.getId());
+    }
+
+    @Test
+    @DisplayName("전체 카테고리 게층구조 조회 테스트")
+    void selectCategoryHierarchy() {
+        // Given
+        Category parent1 = createCategory(null, "thumbUrl", "parent1", null);
+        categoryRepository.insertCategory(parent1);
+
+        Category child1 = createCategory(null, "thumbUrl", "child1", parent1.getId());
+        categoryRepository.insertCategory(child1);
+
+        Category parent2 = createCategory(null, "thumbUrl", "parent2", null);
+        categoryRepository.insertCategory(parent2);
+
+        Category child2 = createCategory(null, "thumbUrl", "child2", parent2.getId());
+        categoryRepository.insertCategory(child2);
+
+        Category child2Child1 = createCategory(null, "thumbUrl", "child2Child1", child2.getId());
+        categoryRepository.insertCategory(child2Child1);
+
+        // When
+        List<CategoryHierarchy> categoryHierarchies = categoryRepository.selectCategoryHierarchy();
+
+        // Then
+        categoryHierarchies.forEach(categoryHierarchy -> System.out.println(categoryHierarchy.getName()));
     }
 
     @Test

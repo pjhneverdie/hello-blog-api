@@ -1,5 +1,7 @@
 package com.jj.hello_blog.domain.category.service;
 
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -43,6 +45,38 @@ public class CategoryService {
             // 카테고리 이름 중복 시
             throw new CustomException(CategoryExceptionCode.DUPLICATED_CATEGORY);
         }
+    }
+
+
+    /**
+     * findCategoryHierarchy, 전체 카테고리 게층구조 조회
+     */
+    public List<CategoryHierarchyResponse> findCategoryHierarchy() {
+        List<CategoryHierarchy> categoryHierarchies = categoryRepository.selectCategoryHierarchy();
+
+        Map<Integer, CategoryHierarchyResponse> categoryMap = categoryHierarchies.stream()
+                .collect(Collectors.toMap(
+                        CategoryHierarchy::getId,
+                        ch -> new CategoryHierarchyResponse(ch.getId(), ch.getName(), ch.getThumbUrl())
+                ));
+
+        List<CategoryHierarchyResponse> rootCategories = new ArrayList<>();
+
+        for (CategoryHierarchy category : categoryHierarchies) {
+            CategoryHierarchyResponse response = categoryMap.get(category.getId());
+            Integer parentId = category.getParentId();
+
+            if (parentId == null) {
+                rootCategories.add(response);
+            } else {
+                CategoryHierarchyResponse parent = categoryMap.get(parentId);
+                if (parent != null) {
+                    parent.getChildren().add(response);
+                }
+            }
+        }
+
+        return rootCategories;
     }
 
     /**

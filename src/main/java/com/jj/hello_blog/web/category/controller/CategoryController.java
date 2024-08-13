@@ -2,6 +2,7 @@ package com.jj.hello_blog.web.category.controller;
 
 import java.util.List;
 
+import com.jj.hello_blog.domain.category.dto.CategoryHierarchyResponse;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
@@ -40,6 +41,13 @@ public class CategoryController {
         CategoryAddDto categoryAddDto = new CategoryAddDto(thumbImageFile, categoryAddForm.getName(), categoryAddForm.getParentId());
 
         return ResponseEntity.ok(new ApiResponse<>(categoryService.addCategory(categoryAddDto)));
+    }
+
+    @GetMapping("/hierarchy")
+    ResponseEntity<ApiResponse<List<CategoryHierarchyResponse>>> findCategoryHierarchy() {
+        List<CategoryHierarchyResponse> categoryHierarchy = categoryService.findCategoryHierarchy();
+
+        return ResponseEntity.ok(new ApiResponse<>(categoryHierarchy));
     }
 
     @GetMapping()
