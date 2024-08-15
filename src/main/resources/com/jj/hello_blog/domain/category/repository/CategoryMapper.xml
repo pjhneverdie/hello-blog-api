@@ -13,7 +13,7 @@
     </resultMap>
 
     <!-- 카테고리 인서트 -->
-    <insert id="insertCategory" useGeneratedKeys="true">
+    <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO category(id, name, thumb_url, parent_id, created_at)
         VALUES (NULL, #{name}, #{thumbUrl}, #{parentId}, NULL)
     </insert>
@@ -30,7 +30,7 @@
         WITH RECURSIVE CategoryHierarchy AS (SELECT id AS category_id,
                                                     id AS top_category_id,
                                                     parent_id
-                                             FROM categoryAddQueryDto
+                                             FROM category
                                              WHERE parent_id IS NULL
 
                                              UNION ALL
@@ -38,7 +38,7 @@
                                              SELECT c.id AS category_id,
                                                     ch.top_category_id,
                                                     c.parent_id
-                                             FROM categoryAddQueryDto c
+                                             FROM category c
                                                       INNER JOIN
                                                   CategoryHierarchy ch ON c.parent_id = ch.category_id)
 
@@ -93,7 +93,7 @@
         UPDATE category
         SET name       = #{name},
             thumb_url  = #{thumbUrl},
-            parent_id  = #{parentId},
+            parent_id  = #{parentId}
         WHERE id = #{id}
     </update>
 

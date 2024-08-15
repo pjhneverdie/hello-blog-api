@@ -42,7 +42,7 @@ public class AdminCategoryController {
     @PatchMapping
     ResponseEntity<ApiResponse<Boolean>> updateCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @Valid @RequestBody CategoryUpdateForm categoryUpdateForm
+            @Valid @RequestPart CategoryUpdateForm categoryUpdateForm
     ) {
         CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile, categoryUpdateForm.getParentId());
 

@@ -51,6 +51,10 @@ public class CategoryRepositoryTest {
 
         // Then
         assertEquals(categoryResponses.get(0).getId(), parent.getId());
+        assertEquals(categoryResponses.get(0).getName(), parent.getName());
+        assertEquals(categoryResponses.get(0).getThumbUrl(), parent.getThumbUrl());
+        assertEquals(categoryResponses.get(0).getCreatedAt(), parent.getCreatedAt());
+        assertEquals(categoryResponses.get(0).getPostCount(), 0);
     }
 
     @Test

@@ -18,7 +18,6 @@ public class AdminCheckInterceptor extends SessionInterceptor {
             return true;
         }
 
-
         HttpSession session = request.getSession(false);
 
         System.out.println(session == null);
