@@ -13,7 +13,9 @@ import com.jj.hello_blog.web.common.response.ApiResponse;
 @Component
 public class SignInCheckInterCeptor extends SessionInterceptor {
 
-    private static final String[] EXCLUDED_PATHS = new String[]{"/member/signUp", "/member/signIn"};
+    private static final String[] EXCLUDED_PATHS = new String[]{
+            "/member/signUp", "/member/signIn"
+    };
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

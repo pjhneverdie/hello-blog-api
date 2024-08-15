@@ -24,6 +24,9 @@ public class OwnerCheckInterCeptor extends SessionInterceptor {
         }
 
         HttpSession session = request.getSession(false);
+
+        System.out.println(session == null);
+
         if (session != null && session.getAttribute(SessionConst.MEMBER_KEY) != null) {
             if (checkOwnerPassword((Member) session.getAttribute(SessionConst.MEMBER_KEY))) {
                 return true;

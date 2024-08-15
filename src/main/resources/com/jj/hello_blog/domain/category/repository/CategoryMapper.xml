@@ -6,12 +6,13 @@
     <resultMap id="CategoryResponseMap" type="CategoryResponse">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
+        <result property="thumbUrl" column="thumbUrl"/>
         <result property="postCount" column="postCount"/>
     </resultMap>
 
     <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO category(thumb_url, name, parent_id)
-        VALUES (#{thumbUrl}, #{name}, #{parentId})
+        INSERT INTO category(name, thumb_url, parent_id)
+        VALUES (#{name}, #{thumbUrl}, #{parentId})
     </insert>
 
     <select id="selectCategoryHierarchy" resultType="CategoryHierarchy">
@@ -80,22 +81,14 @@
 
     <select id="selectCategoriesByParentId" resultMap="CategoryResponseMap">
         WITH RECURSIVE CategoryHierarchy AS (SELECT id,
-                                                    thumb_url,
                                                     name,
+                                                    thumb_url,
                                                     parent_id
                                              FROM category
-                                             WHERE id = #{parentId}
-                                             UNION ALL
-                                             SELECT c.id,
-                                                    c.thumb_url,
-                                                    c.name,
-                                                    c.parent_id
-                                             FROM category c
-                                                      INNER JOIN
-                                                  CategoryHierarchy ch ON c.parent_id = ch.id)
+                                             WHERE parent_id = #{parentId})
         SELECT ch.id                   AS id,
-               ch.thumb_url            AS thumbUrl,
                ch.name                 AS name,
+               ch.thumb_url            AS thumbUrl,
                IFNULL(p.post_count, 0) AS postCount
         FROM CategoryHierarchy ch
                  LEFT JOIN (SELECT category_id,

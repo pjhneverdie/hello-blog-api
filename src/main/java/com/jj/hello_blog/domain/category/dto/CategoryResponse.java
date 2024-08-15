@@ -11,9 +11,9 @@ public class CategoryResponse {
 
     private Integer id;
 
-    private String thumbUrl;
-
     private String name;
+
+    private String thumbUrl;
 
     private Integer postCount;
 
