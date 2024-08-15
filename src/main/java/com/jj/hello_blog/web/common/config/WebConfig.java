@@ -1,6 +1,6 @@
 package com.jj.hello_blog.web.common.config;
 
-import com.jj.hello_blog.web.common.session.OwnerCheckInterCeptor;
+import com.jj.hello_blog.web.common.session.AdminCheckInterceptor;
 import com.jj.hello_blog.web.common.session.SignInCheckInterCeptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -13,23 +13,16 @@ public class WebConfig implements WebMvcConfigurer {
     private SignInCheckInterCeptor signInCheckInterceptor;
 
     @Autowired
-    private OwnerCheckInterCeptor ownerCheckInterceptor;
+    private AdminCheckInterceptor adminCheckInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(signInCheckInterceptor)
                 .order(1)
-                .addPathPatterns(
-                        "/member/me", "/member/signOut", "/member/delete/**",
-                        "/comment/**",
-                        "/like/**"
-                );
+                .addPathPatterns("/member/me", "/comment/**", "/like/**");
 
-        registry.addInterceptor(ownerCheckInterceptor)
+        registry.addInterceptor(adminCheckInterceptor)
                 .order(2)
-                .addPathPatterns(
-                        "/category/**",
-                        "/post/**"
-                );
+                .addPathPatterns("/admin/**");
     }
 }

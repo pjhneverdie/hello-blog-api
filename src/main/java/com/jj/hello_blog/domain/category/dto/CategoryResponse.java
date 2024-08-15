@@ -4,17 +4,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponse {
 
-    private Integer id;
+    private int id;
 
     private String name;
 
     private String thumbUrl;
 
-    private Integer postCount;
+    private Integer parentId;
+
+    private LocalDateTime createdAt;
+
+    private int postCount;
 
 }

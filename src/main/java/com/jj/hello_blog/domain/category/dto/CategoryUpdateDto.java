@@ -11,9 +11,9 @@ public class CategoryUpdateDto {
 
     private final int id;
 
-    private final MultipartFile thumbImageFile;
-
     private final String name;
+
+    private final MultipartFile thumbImageFile;
 
     private final Integer parentId;
 

@@ -1,11 +1,10 @@
 package com.jj.hello_blog.domain.category.service;
 
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jj.hello_blog.domain.category.dto.*;
 import com.jj.hello_blog.domain.category.repository.CategoryRepository;
@@ -13,7 +12,6 @@ import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
 
 import com.jj.hello_blog.domain.common.exception.CustomException;
 import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -24,22 +22,40 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final S3BucketService s3BucketService;
 
-    private static final String DEFAULT_THUMB_URL = "";
-
     /**
      * addCategory, 카테고리 추가
      */
     public CategoryResponse addCategory(CategoryAddDto categoryAddDto) {
         try {
-            String thumbUrl = uploadThumbImage(categoryAddDto.getThumbImageFile());
+            String thumbUrl = null;
 
-            Category category = new Category(null, thumbUrl, categoryAddDto.getName(), categoryAddDto.getParentId());
+            // 1. 썸네일 업로드
+            // 썸네일은 필수 X
+            if (categoryAddDto.getThumbImageFile() != null) {
+                thumbUrl = uploadThumbImage(categoryAddDto.getThumbImageFile());
+            }
 
+            Category category = new Category(null, categoryAddDto.getName(), thumbUrl, categoryAddDto.getParentId(), null);
+
+            // 2. 카테고리 인서트(id 필드 채워짐, createdAt은 자동으로 안 채워짐)
             categoryRepository.insertCategory(category);
 
+            // 3. 조회해서 createdAt 컬럼 받아 오기
+            Optional<Category> addedCategory = categoryRepository.selectCategoryById(category.getId());
+
+            // 발생 가능성은 희박하나 혹시 몰라서 예외처리
+            if (addedCategory.isEmpty()) {
+                throw new CustomException(CategoryExceptionCode.CATEGORY_NOT_FOUND);
+            }
+
             return new CategoryResponse(
-                    category.getId(), category.getThumbUrl(),
-                    category.getName(), 0);
+                    addedCategory.get().getId(),
+                    addedCategory.get().getName(),
+                    addedCategory.get().getThumbUrl(),
+                    addedCategory.get().getParentId(),
+                    addedCategory.get().getCreatedAt(),
+                    0
+            );
 
         } catch (DuplicateKeyException e) {
             // 카테고리 이름 중복 시
@@ -47,49 +63,17 @@ public class CategoryService {
         }
     }
 
-
     /**
-     * findCategoryHierarchy, 전체 카테고리 게층구조 조회
+     * getCategories, 최상위 카테고리 조회
      */
-    public List<CategoryHierarchyResponse> findCategoryHierarchy() {
-        List<CategoryHierarchy> categoryHierarchies = categoryRepository.selectCategoryHierarchy();
-
-        Map<Integer, CategoryHierarchyResponse> categoryMap = categoryHierarchies.stream()
-                .collect(Collectors.toMap(
-                        CategoryHierarchy::getId,
-                        ch -> new CategoryHierarchyResponse(ch.getId(), ch.getName(), ch.getThumbUrl())
-                ));
-
-        List<CategoryHierarchyResponse> rootCategories = new ArrayList<>();
-
-        for (CategoryHierarchy category : categoryHierarchies) {
-            CategoryHierarchyResponse response = categoryMap.get(category.getId());
-            Integer parentId = category.getParentId();
-
-            if (parentId == null) {
-                rootCategories.add(response);
-            } else {
-                CategoryHierarchyResponse parent = categoryMap.get(parentId);
-                if (parent != null) {
-                    parent.getChildren().add(response);
-                }
-            }
-        }
-
-        return rootCategories;
-    }
-
-    /**
-     * findCategories, 최상위 카테고리 조회
-     */
-    public List<CategoryResponse> findCategories() {
+    public List<CategoryResponse> getCategories() {
         return categoryRepository.selectCategoriesWhereParentIdIsNull();
     }
 
     /**
-     * findCategories, 하위 카테고리 조회
+     * getCategories, 하위 카테고리 조회
      */
-    public List<CategoryResponse> findCategories(int parentId) {
+    public List<CategoryResponse> getCategories(int parentId) {
         return categoryRepository.selectCategoriesByParentId(parentId);
     }
 
@@ -97,16 +81,22 @@ public class CategoryService {
      * updateCategory, 카테고리 수정
      */
     public boolean updateCategory(CategoryUpdateDto categoryUpdateDto) {
-        String thumbUrl = uploadThumbImage(categoryUpdateDto.getThumbImageFile());
+        String thumbUrl = null;
 
+        // 1. 썸네일 업로드
+        // 썸네일은 필수 X
+        if (categoryUpdateDto.getThumbImageFile() != null) {
+            thumbUrl = uploadThumbImage(categoryUpdateDto.getThumbImageFile());
+        }
 
         CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(
                 categoryUpdateDto.getId(),
-                thumbUrl,
                 categoryUpdateDto.getName(),
+                thumbUrl,
                 categoryUpdateDto.getParentId()
         );
 
+        // 2. 카테고리 수정
         categoryRepository.updateCategoryById(categoryUpdateQueryDto);
 
         return true;
@@ -125,14 +115,7 @@ public class CategoryService {
      * uploadThumbImage, 썸네일 업로드 공통 메서드
      */
     private String uploadThumbImage(MultipartFile thumbImageFile) {
-        String thumbUrl;
-
-        if (thumbImageFile == null) {
-            thumbUrl = DEFAULT_THUMB_URL;
-        } else {
-            thumbUrl = s3BucketService.putS3Object(thumbImageFile);
-        }
-
-        return thumbUrl;
+        return s3BucketService.putS3Object(thumbImageFile);
     }
+
 }

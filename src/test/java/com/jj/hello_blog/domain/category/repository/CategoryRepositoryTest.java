@@ -1,9 +1,9 @@
 package com.jj.hello_blog.domain.category.repository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import com.jj.hello_blog.domain.category.dto.Category;
-import com.jj.hello_blog.domain.category.dto.CategoryHierarchy;
 import com.jj.hello_blog.domain.category.dto.CategoryResponse;
 import com.jj.hello_blog.domain.category.dto.CategoryUpdateQueryDto;
 
@@ -27,7 +27,7 @@ public class CategoryRepositoryTest {
     @DisplayName("카테고리 추가 테스트")
     void insertCategory() {
         // Given
-        Category category = createCategory(null, "thumbUrl", "test", null);
+        Category category = createCategory(null, "test", "test", null, null);
 
         // When
         categoryRepository.insertCategory(category);
@@ -37,71 +37,58 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("전체 카테고리 게층구조 조회 테스트")
-    void selectCategoryHierarchy() {
+    @DisplayName("최상위 카테고리 조회 테스트")
+    void selectCategoriesWhereParentIdIsNull() {
         // Given
-        Category parent1 = createCategory(null, "thumbUrl", "parent1", null);
-        categoryRepository.insertCategory(parent1);
+        Category parent = createCategory(null, "parent", "test", null, null);
+        categoryRepository.insertCategory(parent);
 
-        Category child1 = createCategory(null, "thumbUrl", "child1", parent1.getId());
-        categoryRepository.insertCategory(child1);
-
-        Category parent2 = createCategory(null, "thumbUrl", "parent2", null);
-        categoryRepository.insertCategory(parent2);
-
-        Category child2 = createCategory(null, "thumbUrl", "child2", parent2.getId());
-        categoryRepository.insertCategory(child2);
-
-        Category child2Child1 = createCategory(null, "thumbUrl", "child2Child1", child2.getId());
-        categoryRepository.insertCategory(child2Child1);
+        Category child = createCategory(null, "child", "test", parent.getId(), null);
+        categoryRepository.insertCategory(child);
 
         // When
-        List<CategoryHierarchy> categoryHierarchies = categoryRepository.selectCategoryHierarchy();
+        List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesWhereParentIdIsNull();
 
         // Then
-        categoryHierarchies.forEach(categoryHierarchy -> System.out.println(categoryHierarchy.getName()));
+        assertEquals(categoryResponses.get(0).getId(), parent.getId());
     }
 
     @Test
     @DisplayName("하위 카테고리 조회 테스트")
     void selectCategoriesByParentId() {
         // Given
-        Category parent = createCategory(null, "thumbUrl", "parent", null);
+        Category parent = createCategory(null, "parent", "test", null, null);
         categoryRepository.insertCategory(parent);
 
-        Category child = createCategory(null, "thumbUrl", "child", parent.getId());
+        Category child = createCategory(null, "child", "test", parent.getId(), null);
         categoryRepository.insertCategory(child);
+
+        CategoryResponse[] expectedResponses = {
+                new CategoryResponse(parent.getId(), parent.getName(), parent.getThumbUrl(), parent.getParentId(), parent.getCreatedAt(), 0),
+                new CategoryResponse(child.getId(), child.getName(), child.getThumbUrl(), child.getParentId(), child.getCreatedAt(), 0),
+        };
 
         // When
         List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesByParentId(parent.getId());
 
         // Then
-        categoryResponses.get(0).getId().equals(parent.getId());
-        categoryResponses.get(1).getId().equals(child.getId());
-    }
-
-    @Test
-    @DisplayName("최상위 카테고리 조회 테스트")
-    void selectCategoriesWhereParentIdIsNull() {
-        // Given
-        Category parent = createCategory(null, "thumbUrl", "parent", null);
-        categoryRepository.insertCategory(parent);
-
-        // When
-        List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesWhereParentIdIsNull();
-
-        // Then
-        categoryResponses.get(0).getId().equals(parent.getId());
+        for (int i = 0; i < categoryResponses.size(); i++) {
+            assertEquals(categoryResponses.get(i).getId(), expectedResponses[i].getId());
+            assertEquals(categoryResponses.get(i).getName(), expectedResponses[i].getName());
+            assertEquals(categoryResponses.get(i).getThumbUrl(), expectedResponses[i].getThumbUrl());
+            assertEquals(categoryResponses.get(i).getParentId(), expectedResponses[i].getParentId());
+            assertEquals(categoryResponses.get(i).getCreatedAt(), expectedResponses[i].getCreatedAt());
+        }
     }
 
     @Test
     @DisplayName("카테고리 수정 테스트")
     void updateCategoryById() {
         // Given
-        Category category = createCategory(null, "thumbUrl", "test", null);
+        Category category = createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(category);
 
-        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(category.getId(), category.getThumbUrl(), category.getName() + "update", category.getParentId());
+        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(category.getId(), category.getName() + "update", category.getThumbUrl(), category.getParentId());
 
         // When
         categoryRepository.updateCategoryById(categoryUpdateQueryDto);
@@ -119,7 +106,7 @@ public class CategoryRepositoryTest {
     @DisplayName("카테고리 삭제 테스트")
     void deleteCategoryById() {
         // Given
-        Category category = createCategory(null, "thumbUrl", "parent", null);
+        Category category = createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(category);
 
         // When
@@ -133,8 +120,8 @@ public class CategoryRepositoryTest {
     /**
      * createCategory, 카테고리 데이터 생성 유틸
      */
-    public static Category createCategory(Integer id, String thumbUrl, String name, Integer parentId) {
-        return new Category(id, thumbUrl, name, parentId);
+    public static Category createCategory(Integer id, String name, String thumbUrl, Integer parentId, LocalDateTime createAt) {
+        return new Category(id, name, thumbUrl, parentId, createAt);
     }
 
 }

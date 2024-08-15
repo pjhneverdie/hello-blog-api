@@ -9,7 +9,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OwnerCheckInterCeptor extends SessionInterceptor {
+public class AdminCheckInterceptor extends SessionInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -18,10 +18,6 @@ public class OwnerCheckInterCeptor extends SessionInterceptor {
             return true;
         }
 
-        // 카테고리 GET 요청은 인터셉터를 거치지 않도록 함
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/category")) {
-            return true;
-        }
 
         HttpSession session = request.getSession(false);
 

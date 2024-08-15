@@ -41,7 +41,7 @@ public class CommentRepositoryTestSetUp {
         this.member = MemberRepositoryTest.createMember();
         memberRepository.insertMember(member);
 
-        this.category = CategoryRepositoryTest.createCategory(null, "thumbUrl", "test", null);
+        this.category = CategoryRepositoryTest.createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);

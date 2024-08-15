@@ -9,9 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CategoryAddDto {
 
-    private final MultipartFile thumbImageFile;
-
     private final String name;
+
+    private final MultipartFile thumbImageFile;
 
     private final Integer parentId;
 

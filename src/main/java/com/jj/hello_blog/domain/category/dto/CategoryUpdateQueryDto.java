@@ -9,9 +9,9 @@ public class CategoryUpdateQueryDto {
 
     private final int id;
 
-    private final String thumbUrl;
-
     private final String name;
+
+    private final String thumbUrl;
 
     private final Integer parentId;
 

@@ -1,8 +1,8 @@
 package com.jj.hello_blog.domain.like.repository;
 
 import com.jj.hello_blog.domain.category.dto.Category;
-import com.jj.hello_blog.domain.category.repository.CategoryRepository;
 import com.jj.hello_blog.domain.category.repository.CategoryRepositoryTest;
+import com.jj.hello_blog.domain.category.repository.CategoryRepository;
 import com.jj.hello_blog.domain.comment.dto.Comment;
 import com.jj.hello_blog.domain.comment.repository.CommentRepository;
 import com.jj.hello_blog.domain.comment.repository.CommentRepositoryTest;
@@ -49,7 +49,7 @@ public class LikeRepositoryTestSetUp {
         this.member = MemberRepositoryTest.createMember();
         memberRepository.insertMember(member);
 
-        this.category = CategoryRepositoryTest.createCategory(null, "thumbUrl", "test", null);
+        this.category = CategoryRepositoryTest.createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(category);
 
         this.post = PostRepositoryTest.getPost(category);
