@@ -1,5 +1,6 @@
 package com.jj.hello_blog.web.post.validation;
 
+import com.jj.hello_blog.web.common.validation.FileTypeConstraint;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

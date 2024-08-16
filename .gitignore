@@ -38,12 +38,13 @@ out/
 ### VS Code ###
 .vscode/
 
-### Application properties 외부에서 관리
+### properties 외부에서 관리
+src/main/resources/application.properties
+src/test/resources/application.properties
+
 src/main/resources/application-prod.properties
 src/main/resources/application-test.properties
-src/main/resources/application.properties
-
-src/test/resources/application.properties
+src/main/resources/application-local.properties
 
 ### 키스토어 외부에서 관리
 src/main/resources/keystore.p12

@@ -1,4 +1,4 @@
-package com.jj.hello_blog.web.post.validation;
+package com.jj.hello_blog.web.common.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

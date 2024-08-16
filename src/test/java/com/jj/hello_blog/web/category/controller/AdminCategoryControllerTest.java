@@ -2,6 +2,7 @@ package com.jj.hello_blog.web.category.controller;
 
 import java.time.LocalDateTime;
 
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
@@ -114,7 +115,9 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         MockMultipartFile jsonFile = new MockMultipartFile("categoryUpdateForm", "categoryUpdateForm", "application/json", toJson(categoryUpdateForm).getBytes());
         MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());
 
-        when(categoryService.updateCategory(any(CategoryUpdateDto.class))).thenReturn(true);
+        CategoryUpdateResponse categoryUpdateResponse = new CategoryUpdateResponse("updatedThumbUrl");
+
+        when(categoryService.updateCategory(any(CategoryUpdateDto.class))).thenReturn(categoryUpdateResponse);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -125,7 +128,7 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         );
 
         // Then
-        ApiResponse<Boolean> response = new ApiResponse<>(true);
+        ApiResponse<CategoryUpdateResponse> response = new ApiResponse<>(categoryUpdateResponse);
 
         resultActions
                 .andExpect(status().isOk())

@@ -20,10 +20,13 @@ import com.jj.hello_blog.domain.common.exception.GlobalExceptionCode;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleServerException() {
+    public ResponseEntity<ApiResponse<Void>> handleServerException(Exception e) {
         ApiResponse<Void> response = new ApiResponse<>(null);
 
         response.setExceptionCode(GlobalExceptionCode.INTERNAL_SERVER_ERROR.code());
+
+        System.out.println(e.getMessage());
+        System.out.println(e.getClass());
 
         return new ResponseEntity<>(response, GlobalExceptionCode.INTERNAL_SERVER_ERROR.httpStatus());
     }

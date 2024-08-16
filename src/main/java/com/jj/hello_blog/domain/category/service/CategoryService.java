@@ -84,7 +84,7 @@ public class CategoryService {
     /**
      * updateCategory, 카테고리 수정
      */
-    public boolean updateCategory(CategoryUpdateDto categoryUpdateDto) {
+    public CategoryUpdateResponse updateCategory(CategoryUpdateDto categoryUpdateDto) {
         String thumbUrl = categoryUpdateDto.getThumbUrl();
 
         // 1. 썸네일 업로드
@@ -103,7 +103,8 @@ public class CategoryService {
         // 2. 카테고리 수정
         categoryRepository.updateCategoryById(categoryUpdateQueryDto);
 
-        return true;
+        // 나머지 값은 어차피 프론트에도 이미 가지고 있으니 thumbUrl만 리턴
+        return new CategoryUpdateResponse(thumbUrl);
     }
 
     /**

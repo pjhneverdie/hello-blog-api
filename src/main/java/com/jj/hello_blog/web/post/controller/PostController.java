@@ -8,7 +8,7 @@ import com.jj.hello_blog.domain.post.service.PostService;
 import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.web.post.form.PostSaveForm;
 import com.jj.hello_blog.web.post.form.PostUpdateForm;
-import com.jj.hello_blog.web.post.validation.FileTypeConstraint;
+import com.jj.hello_blog.web.common.validation.FileTypeConstraint;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
