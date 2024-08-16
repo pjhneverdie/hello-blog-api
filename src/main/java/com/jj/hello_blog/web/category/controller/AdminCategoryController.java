@@ -44,7 +44,7 @@ public class AdminCategoryController {
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
             @Valid @RequestPart CategoryUpdateForm categoryUpdateForm
     ) {
-        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile, categoryUpdateForm.getParentId());
+        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), categoryUpdateForm.getThumbUrl(), thumbImageFile, categoryUpdateForm.getParentId());
 
         return ResponseEntity.ok(new ApiResponse<>(categoryService.updateCategory(categoryUpdateDto)));
     }

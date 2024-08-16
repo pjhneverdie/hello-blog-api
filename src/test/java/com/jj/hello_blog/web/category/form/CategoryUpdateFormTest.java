@@ -23,7 +23,7 @@ class CategoryUpdateFormTest {
 
     @Test
     void validateId() {
-        CategoryUpdateForm categoryUpdateFormNullId = new CategoryUpdateForm(null, "test", 1);
+        CategoryUpdateForm categoryUpdateFormNullId = new CategoryUpdateForm(null, "test", "test", 1);
 
         Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullId);
         assertFalse(constraintViolations.isEmpty());
@@ -31,8 +31,8 @@ class CategoryUpdateFormTest {
 
     @Test
     void validateName() {
-        CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null, 1);
-        CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ", 1);
+        CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null, "test", 1);
+        CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ", "test", 1);
 
         // null
         Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullName);
@@ -43,5 +43,18 @@ class CategoryUpdateFormTest {
         assertFalse(constraintViolations.isEmpty());
     }
 
+    @Test
+    void validateThumbUrl() {
+        CategoryUpdateForm categoryUpdateFormNullThumbUrl = new CategoryUpdateForm(1, "test", null, 1);
+        CategoryUpdateForm categoryUpdateFormBlankThumbUrl = new CategoryUpdateForm(1, "test", " ", 1);
+
+        // null
+        Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormNullThumbUrl);
+        assertFalse(constraintViolations.isEmpty());
+
+        // empty
+        constraintViolations = validator.validate(categoryUpdateFormBlankThumbUrl);
+        assertFalse(constraintViolations.isEmpty());
+    }
 
 }

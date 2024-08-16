@@ -2,6 +2,7 @@ package com.jj.hello_blog.domain.category.service;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +23,15 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final S3BucketService s3BucketService;
 
+    @Value("${blog.config.category.default.thumburl}")
+    private String DEFAULT_THUMB_URL;
+
     /**
      * addCategory, 카테고리 추가
      */
     public CategoryResponse addCategory(CategoryAddDto categoryAddDto) {
         try {
-            String thumbUrl = null;
+            String thumbUrl = DEFAULT_THUMB_URL;
 
             // 1. 썸네일 업로드
             // 썸네일은 필수 X
@@ -81,7 +85,7 @@ public class CategoryService {
      * updateCategory, 카테고리 수정
      */
     public boolean updateCategory(CategoryUpdateDto categoryUpdateDto) {
-        String thumbUrl = null;
+        String thumbUrl = categoryUpdateDto.getThumbUrl();
 
         // 1. 썸네일 업로드
         // 썸네일은 필수 X

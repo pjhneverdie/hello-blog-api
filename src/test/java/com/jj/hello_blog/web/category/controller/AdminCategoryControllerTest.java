@@ -109,7 +109,7 @@ class AdminCategoryControllerTest extends ControllerTestBase {
     @DisplayName("카테고리 수정 테스트")
     void updateCategory() throws Exception {
         // Given
-        CategoryUpdateForm categoryUpdateForm = new CategoryUpdateForm(1, "test", null);
+        CategoryUpdateForm categoryUpdateForm = new CategoryUpdateForm(1, "test", "test", null);
 
         MockMultipartFile jsonFile = new MockMultipartFile("categoryUpdateForm", "categoryUpdateForm", "application/json", toJson(categoryUpdateForm).getBytes());
         MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());

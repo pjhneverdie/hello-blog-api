@@ -13,6 +13,8 @@ public class CategoryUpdateDto {
 
     private final String name;
 
+    private final String thumbUrl;
+
     private final MultipartFile thumbImageFile;
 
     private final Integer parentId;

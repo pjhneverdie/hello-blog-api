@@ -1,5 +1,6 @@
 package com.jj.hello_blog.domain.common.aws.service;
 
+import com.amazonaws.AmazonServiceException;
 import lombok.RequiredArgsConstructor;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
+import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class S3BucketService {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
-    private static final String BASIC_PATH = "test/";
+    private static final String BASIC_PATH = "image/";
 
     public String putS3Object(MultipartFile file) {
         try {
@@ -40,4 +42,5 @@ public class S3BucketService {
             throw new RuntimeException(ie);
         }
     }
+
 }

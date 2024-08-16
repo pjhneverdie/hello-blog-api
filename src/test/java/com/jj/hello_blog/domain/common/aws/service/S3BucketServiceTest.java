@@ -1,20 +1,19 @@
 package com.jj.hello_blog.domain.common.aws.service;
 
+import java.net.URL;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.io.ByteArrayInputStream;
+
+import org.junit.jupiter.api.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.mock.web.MockMultipartFile;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URL;
-
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 

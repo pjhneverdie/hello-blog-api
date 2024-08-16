@@ -16,6 +16,10 @@ public class CategoryUpdateForm {
     @NotNull
     private final String name;
 
+    @NotBlank
+    @NotNull
+    private final String thumbUrl;
+
     private final Integer parentId;
 
 }
