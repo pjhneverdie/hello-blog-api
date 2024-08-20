@@ -2,7 +2,6 @@ package com.jj.hello_blog.web.category.controller;
 
 import java.time.LocalDateTime;
 
-import com.jj.hello_blog.domain.category.dto.CategoryUpdateResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
@@ -34,9 +33,8 @@ import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.web.category.form.CategoryAddForm;
 import com.jj.hello_blog.web.category.form.CategoryUpdateForm;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -115,9 +113,11 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         MockMultipartFile jsonFile = new MockMultipartFile("categoryUpdateForm", "categoryUpdateForm", "application/json", toJson(categoryUpdateForm).getBytes());
         MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());
 
-        CategoryUpdateResponse categoryUpdateResponse = new CategoryUpdateResponse("updatedThumbUrl");
+        CategoryResponse categoryResponse = new CategoryResponse(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile.getName(), categoryUpdateForm.getParentId(), LocalDateTime.now(), 0);
 
-        when(categoryService.updateCategory(any(CategoryUpdateDto.class))).thenReturn(categoryUpdateResponse);
+        doNothing().when(categoryService).updateCategory(any(CategoryUpdateDto.class));
+
+        when(categoryService.getCategoryAndPostCount(any(int.class))).thenReturn(categoryResponse);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -128,7 +128,7 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         );
 
         // Then
-        ApiResponse<CategoryUpdateResponse> response = new ApiResponse<>(categoryUpdateResponse);
+        ApiResponse<CategoryResponse> response = new ApiResponse<>(categoryResponse);
 
         resultActions
                 .andExpect(status().isOk())

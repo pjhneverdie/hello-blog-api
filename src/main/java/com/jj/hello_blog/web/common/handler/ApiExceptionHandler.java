@@ -2,9 +2,11 @@ package com.jj.hello_blog.web.common.handler;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +15,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.domain.common.exception.CustomException;
 import com.jj.hello_blog.domain.common.exception.GlobalExceptionCode;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -24,9 +29,6 @@ public class ApiExceptionHandler {
         ApiResponse<Void> response = new ApiResponse<>(null);
 
         response.setExceptionCode(GlobalExceptionCode.INTERNAL_SERVER_ERROR.code());
-
-        System.out.println(e.getMessage());
-        System.out.println(e.getClass());
 
         return new ResponseEntity<>(response, GlobalExceptionCode.INTERNAL_SERVER_ERROR.httpStatus());
     }
@@ -41,7 +43,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({HttpMessageConversionException.class, MethodArgumentNotValidException.class})
-    public ResponseEntity<ApiResponse<Void>> handleValidationException() {
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(Exception e) {
         ApiResponse<Void> response = new ApiResponse<>(null);
 
         response.setExceptionCode(GlobalExceptionCode.BAD_REQUEST.code());

@@ -23,14 +23,14 @@ public class CategoryController {
 
     @GetMapping()
     ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
-        List<CategoryResponse> categories = categoryService.getCategories();
+        List<CategoryResponse> categories = categoryService.getRootCategories();
 
         return ResponseEntity.ok(new ApiResponse<>(categories));
     }
 
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories(@PathVariable Integer id) {
-        List<CategoryResponse> categories = categoryService.getCategories(id);
+        List<CategoryResponse> categories = categoryService.getSubCategories(id);
 
         return ResponseEntity.ok(new ApiResponse<>(categories));
     }

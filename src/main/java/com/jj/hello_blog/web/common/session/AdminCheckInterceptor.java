@@ -14,13 +14,11 @@ public class AdminCheckInterceptor extends SessionInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        if (ownerPassword.equals("test")) {
+        if (ownerPassword.equals("test") || request.getMethod().equals("OPTIONS")) {
             return true;
         }
 
         HttpSession session = request.getSession(false);
-
-        System.out.println(session == null);
 
         if (session != null && session.getAttribute(SessionConst.MEMBER_KEY) != null) {
             if (checkOwnerPassword((Member) session.getAttribute(SessionConst.MEMBER_KEY))) {

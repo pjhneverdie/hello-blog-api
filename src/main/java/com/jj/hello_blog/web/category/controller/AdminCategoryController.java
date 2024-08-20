@@ -1,13 +1,13 @@
 package com.jj.hello_blog.web.category.controller;
 
-import com.jj.hello_blog.domain.category.dto.CategoryUpdateResponse;
-import lombok.RequiredArgsConstructor;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jj.hello_blog.web.common.response.ApiResponse;
@@ -41,13 +41,15 @@ public class AdminCategoryController {
     }
 
     @PatchMapping
-    ResponseEntity<ApiResponse<CategoryUpdateResponse>> updateCategory(
+    ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @Valid @RequestPart CategoryUpdateForm categoryUpdateForm
+            @Validated @RequestPart CategoryUpdateForm categoryUpdateForm
     ) {
         CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), categoryUpdateForm.getThumbUrl(), thumbImageFile, categoryUpdateForm.getParentId());
 
-        return ResponseEntity.ok(new ApiResponse<>(categoryService.updateCategory(categoryUpdateDto)));
+        categoryService.updateCategory(categoryUpdateDto);
+
+        return ResponseEntity.ok(new ApiResponse<>(categoryService.getCategoryAndPostCount(categoryUpdateForm.getId())));
     }
 
     @DeleteMapping("/{id}")

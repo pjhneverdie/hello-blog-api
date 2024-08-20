@@ -14,8 +14,8 @@
 
     <!-- 카테고리 인서트 -->
     <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO category(id, name, thumb_url, parent_id, created_at)
-        VALUES (NULL, #{name}, #{thumbUrl}, #{parentId}, NULL)
+        INSERT INTO category(name, thumb_url, parent_id)
+        VALUES (#{name}, #{thumbUrl}, #{parentId})
     </insert>
 
     <!-- id로 카테고리 조회 -->
@@ -23,6 +23,51 @@
         SELECT id, name, thumb_url, parent_id, created_at
         FROM category
         WHERE id = #{id}
+    </select>
+
+    <!-- id의 모든 자식 카테고리 조회 -->
+    <select id="selectAllChildrenById" resultType="Category">
+        WITH RECURSIVE AllChildren AS (SELECT id,
+                                              name,
+                                              thumb_url,
+                                              parent_id,
+                                              created_at
+                                       FROM category
+                                       WHERE id = #{id}
+
+                                       UNION ALL
+
+                                       SELECT children.id,
+                                              children.name,
+                                              children.thumb_url,
+                                              children.parent_id,
+                                              children.created_at
+                                       FROM category children
+                                                INNER JOIN AllChildren ac ON children.parent_id = ac.id)
+
+        SELECT id         AS id,
+               name       AS name,
+               thumb_url  AS thumbUrl,
+               parent_id  AS parentId,
+               created_at AS createdAt
+        FROM AllChildren;
+    </select>
+
+
+    <!-- 카테고리랑 카테고리에 게시된 글 수 조인  -->
+    <select id="selectCategoryAndPostCountJoinPostById" resultMap="CategoryResponseMap">
+        SELECT c.id                    AS id,
+               c.name                  AS name,
+               c.thumb_url             AS thumbUrl,
+               c.parent_id             AS parentId,
+               c.created_at            AS createdAt,
+               IFNULL(p.post_count, 0) AS postCount
+        FROM category c
+                 LEFT JOIN (SELECT category_id,
+                                   COUNT(*) AS post_count
+                            FROM post
+                            GROUP BY category_id) p ON c.id = p.category_id
+        WHERE c.id = #{id}
     </select>
 
     <!-- 최상위 카테고리와 그 하위 카테고리를 포함하여, 총 게시된 글의 수를 조회 -->
@@ -91,9 +136,9 @@
     <!-- 카테고리 수정 -->
     <update id="updateCategoryById">
         UPDATE category
-        SET name       = #{name},
-            thumb_url  = #{thumbUrl},
-            parent_id  = #{parentId}
+        SET name      = #{name},
+            thumb_url = #{thumbUrl},
+            parent_id = #{parentId}
         WHERE id = #{id}
     </update>
 

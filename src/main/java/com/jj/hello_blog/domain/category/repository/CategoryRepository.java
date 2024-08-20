@@ -23,6 +23,14 @@ public class CategoryRepository {
         return Optional.ofNullable(categoryMapper.selectCategoryById(id));
     }
 
+    public List<Category> selectAllChildrenById(int id) {
+        return categoryMapper.selectAllChildrenById(id);
+    }
+
+    public CategoryResponse selectCategoryAndPostCountJoinPostById(int id) {
+        return categoryMapper.selectCategoryAndPostCountJoinPostById(id);
+    }
+
     public List<CategoryResponse> selectCategoriesWhereParentIdIsNull() {
         return categoryMapper.selectCategoriesWhereParentIdIsNull();
     }

@@ -28,6 +28,7 @@ public class CategoryService {
 
     /**
      * addCategory, 카테고리 추가
+     * 인서트는 프로젝트가 간단해서 커맨드랑 쿼리 분리 스킵
      */
     public CategoryResponse addCategory(CategoryAddDto categoryAddDto) {
         try {
@@ -45,19 +46,14 @@ public class CategoryService {
             categoryRepository.insertCategory(category);
 
             // 3. 조회해서 createdAt 컬럼 받아 오기
-            Optional<Category> addedCategory = categoryRepository.selectCategoryById(category.getId());
-
-            // 발생 가능성은 희박하나 혹시 몰라서 예외처리
-            if (addedCategory.isEmpty()) {
-                throw new CustomException(CategoryExceptionCode.CATEGORY_NOT_FOUND);
-            }
+            Category addedCategory = categoryRepository.selectCategoryById(category.getId()).get();
 
             return new CategoryResponse(
-                    addedCategory.get().getId(),
-                    addedCategory.get().getName(),
-                    addedCategory.get().getThumbUrl(),
-                    addedCategory.get().getParentId(),
-                    addedCategory.get().getCreatedAt(),
+                    addedCategory.getId(),
+                    addedCategory.getName(),
+                    addedCategory.getThumbUrl(),
+                    addedCategory.getParentId(),
+                    addedCategory.getCreatedAt(),
                     0
             );
 
@@ -68,23 +64,51 @@ public class CategoryService {
     }
 
     /**
-     * getCategories, 최상위 카테고리 조회
+     * getCategoryAndPostCount, 카테고리랑 카테고리에 게시된 글 수 조인
      */
-    public List<CategoryResponse> getCategories() {
+    public CategoryResponse getCategoryAndPostCount(int id) {
+        return categoryRepository.selectCategoryAndPostCountJoinPostById(id);
+    }
+
+    /**
+     * getRootCategories, 최상위 카테고리 조회
+     */
+    public List<CategoryResponse> getRootCategories() {
         return categoryRepository.selectCategoriesWhereParentIdIsNull();
     }
 
     /**
-     * getCategories, 하위 카테고리 조회
+     * getSubCategories, 하위 카테고리 조회
      */
-    public List<CategoryResponse> getCategories(int parentId) {
+    public List<CategoryResponse> getSubCategories(int parentId) {
         return categoryRepository.selectCategoriesByParentId(parentId);
     }
 
     /**
      * updateCategory, 카테고리 수정
      */
-    public CategoryUpdateResponse updateCategory(CategoryUpdateDto categoryUpdateDto) {
+    public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
+        if (categoryUpdateDto.getParentId() != null) {
+            Optional<Category> category = categoryRepository.selectCategoryById(categoryUpdateDto.getParentId());
+
+            //  존재하지 않는 카테고리의 하위 카테고리로 옮기는 경우
+            if (category.isEmpty()) {
+                throw new CustomException(CategoryExceptionCode.CATEGORY_NOT_FOUND);
+            }
+        }
+
+        // 내 아래 자식들
+        List<Category> categories = categoryRepository.selectAllChildrenById(categoryUpdateDto.getId());
+
+        // 지금 이동하려는 카테고리가 내 자식 카테고리인지 확인
+        boolean isValidHierarchy = categories.stream().filter(category -> category.getId().equals(categoryUpdateDto.getParentId())).toList().isEmpty();
+
+        // 부모 카테고리는 자식 카테고리로 이동할 수 없음
+        // A -> B -> C 계층구조에서, A는 B로 B는 C로 갈 수 없다는 말
+        if (!isValidHierarchy) {
+            throw new CustomException(CategoryExceptionCode.INVALID_CATEGORY_HIERARCHY);
+        }
+
         String thumbUrl = categoryUpdateDto.getThumbUrl();
 
         // 1. 썸네일 업로드
@@ -102,9 +126,6 @@ public class CategoryService {
 
         // 2. 카테고리 수정
         categoryRepository.updateCategoryById(categoryUpdateQueryDto);
-
-        // 나머지 값은 어차피 프론트에도 이미 가지고 있으니 thumbUrl만 리턴
-        return new CategoryUpdateResponse(thumbUrl);
     }
 
     /**

@@ -1,11 +1,12 @@
 package com.jj.hello_blog.web.common.validation;
 
+import java.util.Set;
+import java.util.HashSet;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
 
 public class FileTypeValidator implements ConstraintValidator<FileTypeConstraint, MultipartFile> {
 

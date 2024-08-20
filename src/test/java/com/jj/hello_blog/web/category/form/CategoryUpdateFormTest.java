@@ -30,6 +30,14 @@ class CategoryUpdateFormTest {
     }
 
     @Test
+    void validateWrongHierarchy() {
+        CategoryUpdateForm categoryUpdateFormWrongHierarchy = new CategoryUpdateForm(1, "test", "test", 1);
+
+        Set<ConstraintViolation<CategoryUpdateForm>> constraintViolations = validator.validate(categoryUpdateFormWrongHierarchy);
+        assertFalse(constraintViolations.isEmpty());
+    }
+
+    @Test
     void validateName() {
         CategoryUpdateForm categoryUpdateFormNullName = new CategoryUpdateForm(1, null, "test", 1);
         CategoryUpdateForm categoryUpdateFormBlankName = new CategoryUpdateForm(1, " ", "test", 1);

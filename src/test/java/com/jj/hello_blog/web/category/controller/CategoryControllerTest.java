@@ -41,13 +41,13 @@ class CategoryControllerTest extends ControllerTestBase {
 
     @Test
     @DisplayName("최상위 카테고리 조회 테스트")
-    void findSuperParentCategories() throws Exception {
+    void getRootCategories() throws Exception {
         // Given
         List<CategoryResponse> categoryResponse = new ArrayList<>();
         categoryResponse.add(new CategoryResponse(1, "root1", "test", null, LocalDateTime.now(), 0));
         categoryResponse.add(new CategoryResponse(2, "root2", "test", null, LocalDateTime.now(), 0));
 
-        when(categoryService.getCategories()).thenReturn(categoryResponse);
+        when(categoryService.getRootCategories()).thenReturn(categoryResponse);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/category"));
@@ -62,13 +62,13 @@ class CategoryControllerTest extends ControllerTestBase {
 
     @Test
     @DisplayName("하위 카테고리 조회 테스트")
-    void findChildCategories() throws Exception {
+    void getSubCategories() throws Exception {
         // Given
         List<CategoryResponse> categoryResponse = new ArrayList<>();
         categoryResponse.add(new CategoryResponse(3, "root1-child1", "test", 1, LocalDateTime.now(), 0));
         categoryResponse.add(new CategoryResponse(4, "root1-child2", "test", 1, LocalDateTime.now(), 0));
 
-        when(categoryService.getCategories(any(int.class))).thenReturn(categoryResponse);
+        when(categoryService.getSubCategories(any(int.class))).thenReturn(categoryResponse);
 
         // When
         ResultActions resultActions = mockMvc.perform(get("/category/1"));

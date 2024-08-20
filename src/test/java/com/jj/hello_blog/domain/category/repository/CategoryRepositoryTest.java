@@ -2,10 +2,7 @@ package com.jj.hello_blog.domain.category.repository;
 
 import java.util.List;
 import java.time.LocalDateTime;
-
-import com.jj.hello_blog.domain.category.dto.Category;
-import com.jj.hello_blog.domain.category.dto.CategoryResponse;
-import com.jj.hello_blog.domain.category.dto.CategoryUpdateQueryDto;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.jj.hello_blog.domain.category.dto.Category;
+import com.jj.hello_blog.domain.category.dto.CategoryResponse;
+import com.jj.hello_blog.domain.category.dto.CategoryUpdateQueryDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,24 +38,100 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("최상위 카테고리 조회 테스트")
-    void selectCategoriesWhereParentIdIsNull() {
+    @DisplayName("id로 카테고리 조회 테스트")
+    void selectCategoryById() {
         // Given
-        Category parent = createCategory(null, "parent", "test", null, null);
+        Category category = createCategory(null, "test", "test", null, null);
+        categoryRepository.insertCategory(category);
+
+        // When
+        Optional<Category> selected = categoryRepository.selectCategoryById(category.getId());
+
+        // Then
+        assertTrue(selected.isPresent());
+        assertEquals(category.getId(), selected.get().getId());
+        assertEquals(category.getName(), selected.get().getName());
+        assertEquals(category.getThumbUrl(), selected.get().getThumbUrl());
+        assertEquals(category.getParentId(), selected.get().getParentId());
+    }
+
+    @Test
+    @DisplayName("id의 모든 자식 카테고리 조회")
+    void selectAllChildrenById() {
+        // Given
+        Category parent = createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(parent);
 
         Category child = createCategory(null, "child", "test", parent.getId(), null);
         categoryRepository.insertCategory(child);
 
+        Category child_child1 = createCategory(null, "child_child1", "test", child.getId(), null);
+        categoryRepository.insertCategory(child_child1);
+
+        Category child_child2 = createCategory(null, "child_child2", "test", child.getId(), null);
+        categoryRepository.insertCategory(child_child2);
+
+        Category[] expectedResponse = {child, child_child1, child_child2};
+
+        // When
+        List<Category> children = categoryRepository.selectAllChildrenById(child.getId());
+
+        // Then
+        assertEquals(children.size(), expectedResponse.length);
+
+        for (int i = 0; i < children.size(); i++) {
+            assertEquals(children.get(i).getId(), expectedResponse[i].getId());
+            assertEquals(children.get(i).getName(), expectedResponse[i].getName());
+            assertEquals(children.get(i).getThumbUrl(), expectedResponse[i].getThumbUrl());
+        }
+    }
+
+    @Test
+    @DisplayName("id로 카테고리랑 카테고리에 게시된 글 수 조회 테스트")
+    void selectCategoryAndPostCountJoinPostById() {
+        // Given
+        Category category = createCategory(null, "test", "test", null, null);
+        categoryRepository.insertCategory(category);
+
+        CategoryResponse expectedResponse = new CategoryResponse(category.getId(), category.getName(), category.getThumbUrl(), category.getParentId(), category.getCreatedAt(), 0);
+
+        // When
+        CategoryResponse categoryResponse = categoryRepository.selectCategoryAndPostCountJoinPostById(category.getId());
+
+        // Then
+        assertEquals(categoryResponse.getId(), expectedResponse.getId());
+        assertEquals(categoryResponse.getName(), expectedResponse.getName());
+        assertEquals(categoryResponse.getThumbUrl(), expectedResponse.getThumbUrl());
+        assertEquals(categoryResponse.getParentId(), expectedResponse.getParentId());
+        assertEquals(categoryResponse.getPostCount(), expectedResponse.getPostCount());
+    }
+
+    @Test
+    @DisplayName("최상위 카테고리 조회 테스트")
+    void selectCategoriesWhereParentIdIsNull() {
+        // Given
+        Category parent1 = createCategory(null, "parent1", "test", null, null);
+        categoryRepository.insertCategory(parent1);
+
+        Category parent2 = createCategory(null, "parent2", "test", null, null);
+        categoryRepository.insertCategory(parent2);
+
+        CategoryResponse[] expectedResponse = {
+                new CategoryResponse(parent1.getId(), parent1.getName(), parent1.getThumbUrl(), parent1.getParentId(), parent1.getCreatedAt(), 0),
+                new CategoryResponse(parent2.getId(), parent2.getName(), parent2.getThumbUrl(), parent2.getParentId(), parent2.getCreatedAt(), 0)
+        };
+
         // When
         List<CategoryResponse> categoryResponses = categoryRepository.selectCategoriesWhereParentIdIsNull();
 
         // Then
-        assertEquals(categoryResponses.get(0).getId(), parent.getId());
-        assertEquals(categoryResponses.get(0).getName(), parent.getName());
-        assertEquals(categoryResponses.get(0).getThumbUrl(), parent.getThumbUrl());
-        assertEquals(categoryResponses.get(0).getCreatedAt(), parent.getCreatedAt());
-        assertEquals(categoryResponses.get(0).getPostCount(), 0);
+
+        for (int i = 0; i < categoryResponses.size(); i++) {
+            assertEquals(categoryResponses.get(i).getId(), expectedResponse[i].getId());
+            assertEquals(categoryResponses.get(i).getName(), expectedResponse[i].getName());
+            assertEquals(categoryResponses.get(i).getThumbUrl(), expectedResponse[i].getThumbUrl());
+            assertEquals(categoryResponses.get(i).getPostCount(), expectedResponse[i].getPostCount());
+        }
     }
 
     @Test
@@ -67,7 +144,7 @@ public class CategoryRepositoryTest {
         Category child = createCategory(null, "child", "test", parent.getId(), null);
         categoryRepository.insertCategory(child);
 
-        CategoryResponse[] expectedResponses = {
+        CategoryResponse[] expectedResponse = {
                 new CategoryResponse(parent.getId(), parent.getName(), parent.getThumbUrl(), parent.getParentId(), parent.getCreatedAt(), 0),
                 new CategoryResponse(child.getId(), child.getName(), child.getThumbUrl(), child.getParentId(), child.getCreatedAt(), 0),
         };
@@ -77,11 +154,10 @@ public class CategoryRepositoryTest {
 
         // Then
         for (int i = 0; i < categoryResponses.size(); i++) {
-            assertEquals(categoryResponses.get(i).getId(), expectedResponses[i].getId());
-            assertEquals(categoryResponses.get(i).getName(), expectedResponses[i].getName());
-            assertEquals(categoryResponses.get(i).getThumbUrl(), expectedResponses[i].getThumbUrl());
-            assertEquals(categoryResponses.get(i).getParentId(), expectedResponses[i].getParentId());
-            assertEquals(categoryResponses.get(i).getCreatedAt(), expectedResponses[i].getCreatedAt());
+            assertEquals(categoryResponses.get(i).getId(), expectedResponse[i].getId());
+            assertEquals(categoryResponses.get(i).getName(), expectedResponse[i].getName());
+            assertEquals(categoryResponses.get(i).getThumbUrl(), expectedResponse[i].getThumbUrl());
+            assertEquals(categoryResponses.get(i).getParentId(), expectedResponse[i].getParentId());
         }
     }
 
@@ -98,12 +174,14 @@ public class CategoryRepositoryTest {
         categoryRepository.updateCategoryById(categoryUpdateQueryDto);
 
         // Then
-        List<CategoryResponse> categories = categoryRepository.selectCategoriesWhereParentIdIsNull();
+        Optional<Category> updated = categoryRepository.selectCategoryById(category.getId());
 
-        categories.forEach((categoryResponse) -> {
-            assertEquals(categoryResponse.getId(), categoryUpdateQueryDto.getId());
-            assertEquals(categoryResponse.getId(), (int) category.getId());
-        });
+        assertTrue(updated.isPresent());
+        assertEquals(category.getId(), updated.get().getId());
+        // 이름만 수정했으니
+        assertNotEquals(category.getName(), updated.get().getName());
+        assertEquals(category.getThumbUrl(), updated.get().getThumbUrl());
+        assertEquals(category.getParentId(), updated.get().getParentId());
     }
 
     @Test
