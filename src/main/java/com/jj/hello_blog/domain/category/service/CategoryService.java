@@ -2,17 +2,17 @@ package com.jj.hello_blog.domain.category.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.jj.hello_blog.domain.category.dto.*;
 import com.jj.hello_blog.domain.category.repository.CategoryRepository;
 import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
 
 import com.jj.hello_blog.domain.common.exception.CustomException;
-import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
+import com.jj.hello_blog.domain.common.aws.service.S3BucketImageService;
 
 import java.util.*;
 
@@ -21,46 +21,31 @@ import java.util.*;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final S3BucketService s3BucketService;
+    private final S3BucketImageService s3BucketImageService;
 
-    @Value("${blog.config.category.default.thumburl}")
+    @Value("${blog.config.category.default.category.thumburl}")
     private String DEFAULT_THUMB_URL;
 
     /**
      * addCategory, 카테고리 추가
-     * 인서트는 프로젝트가 간단해서 커맨드랑 쿼리 분리 스킵
      */
-    public CategoryResponse addCategory(CategoryAddDto categoryAddDto) {
-        try {
-            String thumbUrl = DEFAULT_THUMB_URL;
+    public int addCategory(CategoryAddDto categoryAddDto) {
+        checkDuplicatedCategory(categoryAddDto);
 
-            // 1. 썸네일 업로드
-            // 썸네일은 필수 X
-            if (categoryAddDto.getThumbImageFile() != null) {
-                thumbUrl = uploadThumbImage(categoryAddDto.getThumbImageFile());
-            }
+        String thumbUrl = DEFAULT_THUMB_URL;
 
-            Category category = new Category(null, categoryAddDto.getName(), thumbUrl, categoryAddDto.getParentId(), null);
-
-            // 2. 카테고리 인서트(id 필드 채워짐, createdAt은 자동으로 안 채워짐)
-            categoryRepository.insertCategory(category);
-
-            // 3. 조회해서 createdAt 컬럼 받아 오기
-            Category addedCategory = categoryRepository.selectCategoryById(category.getId()).get();
-
-            return new CategoryResponse(
-                    addedCategory.getId(),
-                    addedCategory.getName(),
-                    addedCategory.getThumbUrl(),
-                    addedCategory.getParentId(),
-                    addedCategory.getCreatedAt(),
-                    0
-            );
-
-        } catch (DuplicateKeyException e) {
-            // 카테고리 이름 중복 시
-            throw new CustomException(CategoryExceptionCode.DUPLICATED_CATEGORY);
+        // 1. 썸네일 업로드
+        // 썸네일은 필수 X
+        if (categoryAddDto.getThumbImageFile() != null) {
+            thumbUrl = s3BucketImageService.putImage(categoryAddDto.getThumbImageFile());
         }
+
+        Category category = new Category(null, categoryAddDto.getName(), thumbUrl, categoryAddDto.getParentId(), null);
+
+        // 2. 카테고리 인서트(id 필드 채워짐, createdAt은 자동으로 안 채워짐)
+        categoryRepository.insertCategory(category);
+
+        return category.getId();
     }
 
     /**
@@ -88,17 +73,83 @@ public class CategoryService {
      * updateCategory, 카테고리 수정
      */
     public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
+        // 이동하려는 카테고리가 존재하는지 확인
         if (categoryUpdateDto.getParentId() != null) {
-            Optional<Category> category = categoryRepository.selectCategoryById(categoryUpdateDto.getParentId());
-
-            //  존재하지 않는 카테고리의 하위 카테고리로 옮기는 경우
-            if (category.isEmpty()) {
-                throw new CustomException(CategoryExceptionCode.CATEGORY_NOT_FOUND);
-            }
+            checkIsExistCategory(categoryUpdateDto.getParentId());
         }
 
+        // 이동하려는 카테고리가 올바른 계층 구조를 따르는지 확인
+        checkIsValidHierarchy(categoryUpdateDto);
+
+        String thumbUrl = categoryUpdateDto.getThumbUrl();
+
+        // 1. 썸네일 업로드
+        // 썸네일은 필수 X
+        if (categoryUpdateDto.getThumbImageFile() != null) {
+            // 기존 썸네일 삭제
+            if (!thumbUrl.equals(DEFAULT_THUMB_URL)) {
+                s3BucketImageService.deleteImage(thumbUrl);
+            }
+
+            thumbUrl = s3BucketImageService.putImage(categoryUpdateDto.getThumbImageFile());
+        }
+
+        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(categoryUpdateDto.getId(), categoryUpdateDto.getName(), thumbUrl, categoryUpdateDto.getParentId());
+
+        // 2. 카테고리 수정
+        categoryRepository.updateCategoryById(categoryUpdateQueryDto);
+    }
+
+    /**
+     * deleteCategory, 카테고리 삭제
+     */
+    public void deleteCategory(int id) {
+        try {
+            Optional<Category> category = categoryRepository.selectCategoryById(id);
+
+            if (!category.get().getThumbUrl().equals(DEFAULT_THUMB_URL)) {
+                s3BucketImageService.deleteImage(category.get().getThumbUrl());
+            }
+
+            categoryRepository.deleteCategoryById(id);
+        } catch (DataIntegrityViolationException e) {
+            // 외래키 제약조건 위배(게시글이 있는데 카테고리를 삭제하려고 한 경우)
+            throw new CustomException(CategoryExceptionCode.POSTS_EXIST_YET);
+        }
+    }
+
+    /**
+     * checkDuplicatedCategory, 카테고리 추가 시 중복인지 확인
+     */
+    private void checkDuplicatedCategory(CategoryAddDto categoryAddDto) {
+        List<Category> categories = categoryRepository.selectCategoriesByName(categoryAddDto.getName());
+
+        boolean isDuplicated = categories.stream()
+                .anyMatch(category -> Objects.equals(category.getParentId(), categoryAddDto.getParentId()));
+
+        if (isDuplicated) {
+            throw new CustomException(CategoryExceptionCode.DUPLICATED_CATEGORY);
+        }
+    }
+
+    /**
+     * checkIsExistCategory, 카테고리 변경 시 존재하는 부모인지 확인
+     */
+    public void checkIsExistCategory(int id) {
+        Optional<Category> category = categoryRepository.selectCategoryById(id);
+
+        //  존재하지 않는 카테고리의 수정 및 옮김
+        if (category.isEmpty()) {
+            throw new CustomException(CategoryExceptionCode.CATEGORY_NOT_FOUND);
+        }
+    }
+
+    /**
+     * checkIsValidHierarchy, 카테고리 변경 시 올바른 계층 구조를 따르는지 확인
+     */
+    private void checkIsValidHierarchy(CategoryUpdateDto categoryUpdateDto) {
         // 내 아래 자식들
-        List<Category> categories = categoryRepository.selectAllChildrenById(categoryUpdateDto.getId());
+        List<Category> categories = categoryRepository.selectAllSubCategoriesById(categoryUpdateDto.getId());
 
         // 지금 이동하려는 카테고리가 내 자식 카테고리인지 확인
         boolean isValidHierarchy = categories.stream().filter(category -> category.getId().equals(categoryUpdateDto.getParentId())).toList().isEmpty();
@@ -108,40 +159,6 @@ public class CategoryService {
         if (!isValidHierarchy) {
             throw new CustomException(CategoryExceptionCode.INVALID_CATEGORY_HIERARCHY);
         }
-
-        String thumbUrl = categoryUpdateDto.getThumbUrl();
-
-        // 1. 썸네일 업로드
-        // 썸네일은 필수 X
-        if (categoryUpdateDto.getThumbImageFile() != null) {
-            thumbUrl = uploadThumbImage(categoryUpdateDto.getThumbImageFile());
-        }
-
-        CategoryUpdateQueryDto categoryUpdateQueryDto = new CategoryUpdateQueryDto(
-                categoryUpdateDto.getId(),
-                categoryUpdateDto.getName(),
-                thumbUrl,
-                categoryUpdateDto.getParentId()
-        );
-
-        // 2. 카테고리 수정
-        categoryRepository.updateCategoryById(categoryUpdateQueryDto);
-    }
-
-    /**
-     * deleteCategory, 카테고리 삭제
-     */
-    public boolean deleteCategory(int id) {
-        categoryRepository.deleteCategoryById(id);
-
-        return true;
-    }
-
-    /**
-     * uploadThumbImage, 썸네일 업로드 공통 메서드
-     */
-    private String uploadThumbImage(MultipartFile thumbImageFile) {
-        return s3BucketService.putS3Object(thumbImageFile);
     }
 
 }

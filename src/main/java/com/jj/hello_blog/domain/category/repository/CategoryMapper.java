@@ -13,7 +13,9 @@ public interface CategoryMapper {
 
     Category selectCategoryById(int id);
 
-    List<Category> selectAllChildrenById(int id);
+    List<Category> selectCategoriesByName(String name);
+
+    List<Category> selectAllSubCategoriesById(int id);
 
     CategoryResponse selectCategoryAndPostCountJoinPostById(int id);
 

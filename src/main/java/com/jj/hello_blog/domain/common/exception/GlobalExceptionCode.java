@@ -6,22 +6,24 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum GlobalExceptionCode implements ExceptionCode {
-    NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND"),
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "BAD_REQUEST"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
 
-    @Override
-    public HttpStatus httpStatus() {
-        return this.httpStatus;
-    }
+    UNAUTHORIZED("UNAUTHORIZED", HttpStatus.UNAUTHORIZED),
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
+    BAD_REQUEST("BAD_REQUEST", HttpStatus.BAD_REQUEST),
+    NOT_FOUND("NOT_FOUND", HttpStatus.NOT_FOUND);
 
     @Override
     public String code() {
         return this.code;
     }
 
-    private final HttpStatus httpStatus;
+    @Override
+    public HttpStatus httpStatus() {
+        return this.httpStatus;
+    }
 
     private final String code;
+
+    private final HttpStatus httpStatus;
 
 }

@@ -25,8 +25,15 @@
         WHERE id = #{id}
     </select>
 
-    <!-- id의 모든 자식 카테고리 조회 -->
-    <select id="selectAllChildrenById" resultType="Category">
+    <!-- name으로 카테고리 조회 -->
+    <select id="selectCategoriesByName" resultType="Category">
+        SELECT id, name, thumb_url, parent_id, created_at
+        FROM category
+        WHERE name = #{name}
+    </select>
+
+    <!-- id의 모든 하위 카테고리 조회 -->
+    <select id="selectAllSubCategoriesById" resultType="Category">
         WITH RECURSIVE AllChildren AS (SELECT id,
                                               name,
                                               thumb_url,

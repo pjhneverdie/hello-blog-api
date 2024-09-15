@@ -3,35 +3,45 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jj.hello_blog.domain.post.repository.PostMapper">
 
-    <insert id="savePost" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO post(title, content, category_id)
-        VALUES (#{title}, #{content}, #{categoryId});
+    <insert id="insertPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post(title, content, thumb_url, category_id)
+        VALUES (#{title}, #{content}, #{thumbUrl}, #{categoryId});
     </insert>
 
-    <update id="updatePost">
-        UPDATE post
-        SET title       = #{title},
-            content     = #{content},
-            category_id = #{categoryId}
-        WHERE id = #{id};
-    </update>
-
-    <delete id="deletePost">
-        DELETE
-        FROM post
-        WHERE id = #{id};
-    </delete>
-
-    <select id="findPostById" resultType="Post">
-        SELECT id, title, content, created_at, fixed_at, category_id
+    <select id="selectPostById" resultType="Post">
+        SELECT id, title, content, thumb_url, category_id, created_at, fixed_at
         FROM post
         WHERE id = #{id}
     </select>
 
-    <select id="countPostByCategoryId" resultType="int">
-        SELECT COUNT(*)
+    <select id="selectPostsOrderByCreatedAtDesc" resultType="PostResponse">
+        SELECT id, title, content, thumb_url, category_id, created_at, fixed_at
         FROM post
-        where category_id = #{categoryId}
+        ORDER BY created_at DESC
+            LIMIT #{offset}, #{limit}
     </select>
+
+    <select id="selectPostsByCategoryIdOrderByCreatedAtDesc" resultType="PostResponse">
+        SELECT id, title, content, thumb_url, category_id, created_at, fixed_at
+        FROM post
+        WHERE category_id = #{categoryId}
+        ORDER BY created_at DESC
+            LIMIT #{postPaginationCond.offset}, #{postPaginationCond.limit}
+    </select>
+
+    <update id="updatePostById">
+        UPDATE post
+        SET title       = #{title},
+            content     = #{content},
+            thumb_url   = #{thumbUrl},
+            category_id = #{categoryId}
+        WHERE id = #{id};
+    </update>
+
+    <delete id="deletePostById">
+        DELETE
+        FROM post
+        WHERE id = #{id};
+    </delete>
 
 </mapper>

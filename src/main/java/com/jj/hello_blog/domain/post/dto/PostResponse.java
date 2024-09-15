@@ -1,21 +1,28 @@
 package com.jj.hello_blog.domain.post.dto;
 
+import java.time.LocalDateTime;
+
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostResponse {
+
     private int id;
+
     private String title;
+
     private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime fixedAt;
+
+    private String thumbUrl;
+
     private int categoryId;
-    private int likeCount;
-    private int commentCount;
+
+    private LocalDateTime fixedAt;
+
+    private LocalDateTime createdAt;
+
 }

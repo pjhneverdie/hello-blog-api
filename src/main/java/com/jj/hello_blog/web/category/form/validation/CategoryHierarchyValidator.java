@@ -18,6 +18,7 @@ public class CategoryHierarchyValidator implements ConstraintValidator<CategoryH
             return false;
         }
 
+        // 내 부모가 나일 수는 없음!
         return !categoryUpdateForm.getId().equals(categoryUpdateForm.getParentId());
     }
 

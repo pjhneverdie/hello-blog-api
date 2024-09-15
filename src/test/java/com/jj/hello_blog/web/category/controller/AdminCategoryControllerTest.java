@@ -55,35 +55,37 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         // Given
         CategoryAddForm categoryAddForm = new CategoryAddForm("test", null);
 
-        MockMultipartFile jsonFile = new MockMultipartFile("categoryAddForm", "categoryAddForm", "application/json", toJson(categoryAddForm).getBytes());
-        MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());
+        MockMultipartFile jsonFile = createMockFormFile(categoryAddForm, "categoryAddForm");
+        MockMultipartFile thumbImageFile = createMockImageFile("thumbImageFile", "jpeg");
 
         CategoryResponse categoryResponse = new CategoryResponse(1, categoryAddForm.getName(), thumbImageFile.getName(), null, LocalDateTime.now(), 0);
-        when(categoryService.addCategory(any(CategoryAddDto.class))).thenReturn(categoryResponse);
+
+        when(categoryService.addCategory(any(CategoryAddDto.class))).thenReturn(1);
+        when(categoryService.getCategoryAndPostCount(any(int.class))).thenReturn(categoryResponse);
 
         // When
         ResultActions resultActions = mockMvc.perform(multipart("/admin/category")
                 .file(thumbImageFile)
                 .file(jsonFile)
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE));
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .session(createMockHttpSessionWithMember(createMember("test@test.com", "123456"))));
 
         // Then
-        ApiResponse<CategoryResponse> response = new ApiResponse<>(categoryResponse);
+        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>(categoryResponse);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
-
     @Test
-    @DisplayName("중복 카테고리 추가 테스트")
+    @DisplayName("카테고리 중복 테스트")
     void addDuplicatedCategory() throws Exception {
         // Given
         CategoryAddForm categoryAddForm = new CategoryAddForm("test", null);
 
-        MockMultipartFile jsonFile = new MockMultipartFile("categoryAddForm", "categoryAddForm", "application/json", toJson(categoryAddForm).getBytes());
-        MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());
+        MockMultipartFile jsonFile = createMockFormFile(categoryAddForm, "categoryAddForm");
+        MockMultipartFile thumbImageFile = createMockImageFile("thumbImageFile", "jpeg");
 
         doThrow(new CustomException(CategoryExceptionCode.DUPLICATED_CATEGORY))
                 .when(categoryService)
@@ -93,25 +95,26 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         ResultActions resultActions = mockMvc.perform(multipart("/admin/category")
                 .file(thumbImageFile)
                 .file(jsonFile)
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE));
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .session(createMockHttpSessionWithMember(createMember("test@test.com", "123456"))));
 
         // Then
-        ApiResponse<Void> response = new ApiResponse<>(null);
-        response.setExceptionCode(CategoryExceptionCode.DUPLICATED_CATEGORY.code());
+        ApiResponse<Void> apiResponse = new ApiResponse<>(null);
+        apiResponse.setExceptionCode(CategoryExceptionCode.DUPLICATED_CATEGORY.code());
 
         resultActions
                 .andExpect(status().is4xxClientError())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
     @Test
     @DisplayName("카테고리 수정 테스트")
     void updateCategory() throws Exception {
         // Given
-        CategoryUpdateForm categoryUpdateForm = new CategoryUpdateForm(1, "test", "test", null);
+        CategoryUpdateForm categoryUpdateForm = new CategoryUpdateForm(1, "test", "thumbUrl", null);
 
-        MockMultipartFile jsonFile = new MockMultipartFile("categoryUpdateForm", "categoryUpdateForm", "application/json", toJson(categoryUpdateForm).getBytes());
-        MockMultipartFile thumbImageFile = new MockMultipartFile("thumbImageFile", "test.png", "image/png", "image-data".getBytes());
+        MockMultipartFile jsonFile = createMockFormFile(categoryUpdateForm, "categoryUpdateForm");
+        MockMultipartFile thumbImageFile = createMockImageFile("thumbImageFile", "jpeg");
 
         CategoryResponse categoryResponse = new CategoryResponse(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile.getName(), categoryUpdateForm.getParentId(), LocalDateTime.now(), 0);
 
@@ -125,32 +128,33 @@ class AdminCategoryControllerTest extends ControllerTestBase {
                         .file(thumbImageFile)
                         .file(jsonFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        );
+                        .session(createMockHttpSessionWithMember(createMember("test@test.com", "123456"))));
 
         // Then
-        ApiResponse<CategoryResponse> response = new ApiResponse<>(categoryResponse);
+        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>(categoryResponse);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
     @Test
     @DisplayName("카테고리 삭제 테스트")
     void deleteCategory() throws Exception {
         // Given
-        when(categoryService.deleteCategory(any(int.class))).thenReturn(true);
+        doNothing().when(categoryService).deleteCategory(any(int.class));
 
         // When
-        ResultActions resultActions = mockMvc.perform(delete("/admin/category/1"));
+        ResultActions resultActions = mockMvc.perform(
+                delete("/admin/category/1")
+                        .session(createMockHttpSessionWithMember(createMember("test@test.com", "123456"))));
 
         // Then
-        ApiResponse<Boolean> response = new ApiResponse<>(true);
+        ApiResponse<Void> apiResponse = new ApiResponse<>(null);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
-
 
 }

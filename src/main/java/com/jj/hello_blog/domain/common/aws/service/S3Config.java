@@ -26,4 +26,5 @@ public class S3Config {
                 .withRegion(Regions.AP_NORTHEAST_2)
                 .build();
     }
+
 }

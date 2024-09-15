@@ -1,8 +1,9 @@
 package com.jj.hello_blog.domain.category.repository;
 
 import java.util.List;
-import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ public class CategoryRepositoryTest {
     @DisplayName("카테고리 추가 테스트")
     void insertCategory() {
         // Given
-        Category category = createCategory(null, "test", "test", null, null);
+        Category category = createCategory(null, "test", "thumbUrl", null, null);
 
         // When
         categoryRepository.insertCategory(category);
@@ -38,26 +39,53 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("id로 카테고리 조회 테스트")
+    @DisplayName("카테고리 id로 조회 테스트")
     void selectCategoryById() {
         // Given
-        Category category = createCategory(null, "test", "test", null, null);
+        Category category = createCategory(null, "test", "thumbUrl", null, null);
         categoryRepository.insertCategory(category);
 
         // When
-        Optional<Category> selected = categoryRepository.selectCategoryById(category.getId());
+        Optional<Category> selectedCategory = categoryRepository.selectCategoryById(category.getId());
 
         // Then
-        assertTrue(selected.isPresent());
-        assertEquals(category.getId(), selected.get().getId());
-        assertEquals(category.getName(), selected.get().getName());
-        assertEquals(category.getThumbUrl(), selected.get().getThumbUrl());
-        assertEquals(category.getParentId(), selected.get().getParentId());
+        assertTrue(selectedCategory.isPresent());
+        assertEquals(category.getId(), selectedCategory.get().getId());
+        assertEquals(category.getName(), selectedCategory.get().getName());
+        assertEquals(category.getThumbUrl(), selectedCategory.get().getThumbUrl());
+        assertEquals(category.getParentId(), selectedCategory.get().getParentId());
     }
 
     @Test
-    @DisplayName("id의 모든 자식 카테고리 조회")
-    void selectAllChildrenById() {
+    @DisplayName("카테고리 이름으로 조회 테스트")
+    void selectCategoriesByName() {
+        // Given
+        String name = "test";
+
+        List<Category> byName = new ArrayList<>();
+
+        Category category1 = createCategory(1, name, "thumbUrl", null, null);
+        Category category2 = createCategory(2, name, "thumbUrl", null, null);
+
+        byName.add(category1);
+        byName.add(category2);
+
+        categoryRepository.insertCategory(category1);
+        categoryRepository.insertCategory(category2);
+
+        // When
+        List<Category> categories = categoryRepository.selectCategoriesByName(name);
+
+        // Then
+        for (int i = 0; i < categories.size(); i++) {
+            assertEquals(byName.get(i).getId(), categories.get(i).getId());
+        }
+
+    }
+
+    @Test
+    @DisplayName("카테고리의 모든 자식 카테고리 조회 테스트")
+    void selectAllSubCategoriesById() {
         // Given
         Category parent = createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(parent);
@@ -74,7 +102,7 @@ public class CategoryRepositoryTest {
         Category[] expectedResponse = {child, child_child1, child_child2};
 
         // When
-        List<Category> children = categoryRepository.selectAllChildrenById(child.getId());
+        List<Category> children = categoryRepository.selectAllSubCategoriesById(child.getId());
 
         // Then
         assertEquals(children.size(), expectedResponse.length);
@@ -87,7 +115,7 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("id로 카테고리랑 카테고리에 게시된 글 수 조회 테스트")
+    @DisplayName("카테고리랑 그 카테고리에 게시된 글의 개수 조회 테스트")
     void selectCategoryAndPostCountJoinPostById() {
         // Given
         Category category = createCategory(null, "test", "test", null, null);

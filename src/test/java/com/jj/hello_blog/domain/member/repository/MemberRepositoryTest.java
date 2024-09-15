@@ -14,7 +14,7 @@ import com.jj.hello_blog.domain.member.dto.Member;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest()
 public class MemberRepositoryTest {
 
     @Autowired
@@ -34,22 +34,6 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("회원탈퇴 테스트")
-    void deleteMemberById() {
-        // Given
-        Member member = createMember();
-        memberRepository.insertMember(member);
-
-        // When
-        memberRepository.deleteMemberById(member.getId());
-
-        // Then
-        Optional<Member> foundMember = memberRepository.selectMemberByEmail(member.getEmail());
-        assertFalse(foundMember.isPresent());
-    }
-
-
-    @Test
     @DisplayName("이메일로 멤버 조회 테스트")
     void selectMemberByEmail() {
         // Given
@@ -60,7 +44,10 @@ public class MemberRepositoryTest {
         Optional<Member> foundMember = memberRepository.selectMemberByEmail(member.getEmail());
 
         // Then
+        assertTrue(foundMember.isPresent());
         assertEquals(foundMember.get().getId(), member.getId());
+        assertEquals(foundMember.get().getEmail(), member.getEmail());
+        assertEquals(foundMember.get().getPassword(), member.getPassword());
     }
 
     /**

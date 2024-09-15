@@ -1,24 +1,23 @@
 package com.jj.hello_blog.web.member.form;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Set;
+
+import jakarta.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.ConstraintViolation;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemberSignInFormTest {
+
     private Validator validator;
 
     @BeforeEach
     public void setUpValidator() {
-        final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
@@ -38,7 +37,7 @@ class MemberSignInFormTest {
     @Test
     public void validatePassword() {
         MemberSignInForm signInFormNullPassword = new MemberSignInForm("test@test.com", null);
-        MemberSignInForm signInFormBlankPassword = new MemberSignInForm("test@test.com", "      ");
+        MemberSignInForm signInFormBlankPassword = new MemberSignInForm("test@test.com", " ");
         MemberSignInForm signInFormUnderSizePassword = new MemberSignInForm("test@test.com", "12345");
 
         // null

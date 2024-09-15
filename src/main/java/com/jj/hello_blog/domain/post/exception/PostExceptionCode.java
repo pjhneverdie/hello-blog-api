@@ -1,4 +1,4 @@
-package com.jj.hello_blog.domain.member.exception;
+package com.jj.hello_blog.domain.post.exception;
 
 import lombok.RequiredArgsConstructor;
 
@@ -7,19 +7,20 @@ import org.springframework.http.HttpStatus;
 import com.jj.hello_blog.domain.common.exception.ExceptionCode;
 
 @RequiredArgsConstructor
-public enum MemberExceptionCode implements ExceptionCode {
+public enum PostExceptionCode implements ExceptionCode {
 
-    // 이메일 or 비밀번호가 일치하지 않을 시
-    SIGN_IN_FAILED("SIGN_IN_FAILED", HttpStatus.BAD_REQUEST);
+    CATEGORY_NOT_FOUND("CATEGORY_NOT_FOUND", HttpStatus.BAD_REQUEST),
+
+    POST_NOT_FOUND("POST_NOT_FOUND", HttpStatus.BAD_REQUEST);
 
     @Override
     public String code() {
-        return this.code;
+        return code;
     }
 
     @Override
     public HttpStatus httpStatus() {
-        return this.httpStatus;
+        return httpStatus;
     }
 
     private final String code;

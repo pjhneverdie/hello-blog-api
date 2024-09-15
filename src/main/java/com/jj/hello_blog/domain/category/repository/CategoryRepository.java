@@ -23,8 +23,12 @@ public class CategoryRepository {
         return Optional.ofNullable(categoryMapper.selectCategoryById(id));
     }
 
-    public List<Category> selectAllChildrenById(int id) {
-        return categoryMapper.selectAllChildrenById(id);
+    public List<Category> selectCategoriesByName(String name) {
+        return categoryMapper.selectCategoriesByName(name);
+    }
+
+    public List<Category> selectAllSubCategoriesById(int id) {
+        return categoryMapper.selectAllSubCategoriesById(id);
     }
 
     public CategoryResponse selectCategoryAndPostCountJoinPostById(int id) {

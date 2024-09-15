@@ -38,7 +38,6 @@ class CategoryControllerTest extends ControllerTestBase {
     @MockBean
     private CategoryService categoryService;
 
-
     @Test
     @DisplayName("최상위 카테고리 조회 테스트")
     void getRootCategories() throws Exception {
@@ -53,11 +52,11 @@ class CategoryControllerTest extends ControllerTestBase {
         ResultActions resultActions = mockMvc.perform(get("/category"));
 
         // Then
-        ApiResponse<List<CategoryResponse>> response = new ApiResponse<>(categoryResponse);
+        ApiResponse<List<CategoryResponse>> apiResponse = new ApiResponse<>(categoryResponse);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
     @Test
@@ -74,11 +73,11 @@ class CategoryControllerTest extends ControllerTestBase {
         ResultActions resultActions = mockMvc.perform(get("/category/1"));
 
         // Then
-        ApiResponse<List<CategoryResponse>> response = new ApiResponse<>(categoryResponse);
+        ApiResponse<List<CategoryResponse>> apiResponse = new ApiResponse<>(categoryResponse);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
 

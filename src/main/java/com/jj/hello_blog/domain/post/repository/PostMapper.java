@@ -1,21 +1,27 @@
 package com.jj.hello_blog.domain.post.repository;
 
-import com.jj.hello_blog.domain.post.dto.Post;
-import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import com.jj.hello_blog.domain.post.dto.Post;
+import com.jj.hello_blog.domain.post.dto.PostResponse;
+import com.jj.hello_blog.domain.post.dto.PostUpdateQueryDto;
+import com.jj.hello_blog.domain.post.dto.PostPaginationCond;
 
 @Mapper
 public interface PostMapper {
 
-    void savePost(Post post);
+    void insertPost(Post post);
 
-    void updatePost(PostUpdateDto postUpdateDto);
+    Post selectPostById(int id);
 
-    void deletePost(int id);
+    List<PostResponse> selectPostsOrderByCreatedAtDesc(PostPaginationCond postPaginationCond);
 
-    Post findPostById(int id);
+    List<PostResponse> selectPostsByCategoryIdOrderByCreatedAtDesc(int categoryId, PostPaginationCond postPaginationCond);
 
-    int countPostByCategoryId(int id);
+    void updatePostById(PostUpdateQueryDto postUpdateQueryDto);
 
+    void deletePostById(int id);
 
 }

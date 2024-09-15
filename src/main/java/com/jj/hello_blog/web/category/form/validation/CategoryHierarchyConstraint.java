@@ -11,9 +11,11 @@ import jakarta.validation.Constraint;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CategoryHierarchyConstraint {
+
     String message() default "";
 
     Class<?>[] groups() default {};
 
     Class[] payload() default {};
+
 }

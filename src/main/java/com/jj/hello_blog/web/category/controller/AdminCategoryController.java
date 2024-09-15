@@ -7,8 +7,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.annotation.Validated;
 
 import com.jj.hello_blog.web.common.response.ApiResponse;
 import com.jj.hello_blog.web.common.validation.FileTypeConstraint;
@@ -23,6 +24,7 @@ import com.jj.hello_blog.domain.category.service.CategoryService;
 
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RequestMapping("/admin/category")
 @RestController
 @RequiredArgsConstructor
@@ -33,17 +35,19 @@ public class AdminCategoryController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<ApiResponse<CategoryResponse>> addCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @Valid @RequestPart CategoryAddForm categoryAddForm
+            @RequestPart CategoryAddForm categoryAddForm
     ) {
         CategoryAddDto categoryAddDto = new CategoryAddDto(categoryAddForm.getName(), thumbImageFile, categoryAddForm.getParentId());
 
-        return ResponseEntity.ok(new ApiResponse<>(categoryService.addCategory(categoryAddDto)));
+        int savedId = categoryService.addCategory(categoryAddDto);
+
+        return ResponseEntity.ok(new ApiResponse<>(categoryService.getCategoryAndPostCount(savedId)));
     }
 
     @PatchMapping
     ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @Validated @RequestPart CategoryUpdateForm categoryUpdateForm
+            @RequestPart CategoryUpdateForm categoryUpdateForm
     ) {
         CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), categoryUpdateForm.getThumbUrl(), thumbImageFile, categoryUpdateForm.getParentId());
 
@@ -53,8 +57,10 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<Boolean>> deleteCategory(@PathVariable @NotNull Integer id) {
-        return ResponseEntity.ok(new ApiResponse<>(categoryService.deleteCategory(id)));
+    ResponseEntity<ApiResponse<Void>> deleteCategory(@NotNull @PathVariable Integer id) {
+        categoryService.deleteCategory(id);
+
+        return ResponseEntity.ok(new ApiResponse<>(null));
     }
 
 }

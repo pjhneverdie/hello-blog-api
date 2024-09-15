@@ -1,13 +1,12 @@
 package com.jj.hello_blog.web.category.form;
 
-import com.jj.hello_blog.domain.category.exception.CategoryExceptionCode;
-import com.jj.hello_blog.web.category.form.validation.CategoryHierarchyConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import com.jj.hello_blog.web.category.form.validation.CategoryHierarchyConstraint;
 
 @Getter
 @RequiredArgsConstructor

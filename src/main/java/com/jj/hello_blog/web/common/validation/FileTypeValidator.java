@@ -40,4 +40,5 @@ public class FileTypeValidator implements ConstraintValidator<FileTypeConstraint
 
         return ALLOWED_EXTENSIONS.contains(extension);
     }
+
 }

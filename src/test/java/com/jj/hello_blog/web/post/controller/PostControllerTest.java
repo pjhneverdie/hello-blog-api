@@ -1,36 +1,32 @@
 package com.jj.hello_blog.web.post.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jj.hello_blog.domain.common.aws.service.S3BucketService;
-import com.jj.hello_blog.domain.post.dto.PostResponse;
-import com.jj.hello_blog.domain.post.dto.PostSaveDto;
-import com.jj.hello_blog.domain.post.dto.PostUpdateDto;
-import com.jj.hello_blog.domain.post.service.PostService;
-import com.jj.hello_blog.web.ControllerTestBase;
-import com.jj.hello_blog.web.common.response.ApiResponse;
-import com.jj.hello_blog.web.post.form.PostSaveForm;
-
-import com.jj.hello_blog.web.post.form.PostUpdateForm;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.any;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
+import com.jj.hello_blog.domain.post.service.PostService;
+
+import com.jj.hello_blog.domain.post.dto.PostResponse;
+import com.jj.hello_blog.domain.post.dto.PostPaginationCond;
+
+import com.jj.hello_blog.web.ControllerTestBase;
+import com.jj.hello_blog.web.common.response.ApiResponse;
+
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.ArgumentMatchers.any;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(PostController.class)
 class PostControllerTest extends ControllerTestBase {
@@ -39,117 +35,47 @@ class PostControllerTest extends ControllerTestBase {
     private MockMvc mockMvc;
 
     @MockBean
-    private S3BucketService s3BucketService;
-
-    @MockBean
     private PostService postService;
 
+    private static final String BASE_URL = "/post";
+
     @Test
-    @DisplayName("이미지 업로드 테스트")
-    public void uploadImage() throws Exception {
-        // Given
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(
-                "file",
-                "testFile.jpg", "image/jpeg",
-                new ByteArrayInputStream(("This is a test file").getBytes()));
+    @DisplayName("최근 게시글 페이지네이션 테스트")
+    public void getRecentPosts() throws Exception {
+        int page = 1;
 
-        String dummyURL = "http://test/testFile.jpg";
+        List<PostResponse> postResponses = List.of(new PostResponse(1, "title", "content", "thumbUrl", 1, LocalDateTime.now(), LocalDateTime.now()));
 
-        when(s3BucketService.putS3Object(any(MultipartFile.class))).thenReturn(dummyURL);
+        when(postService.getRecentPosts(any(PostPaginationCond.class))).thenReturn(postResponses);
 
-        // When
-        ResultActions resultActions = mockMvc.perform(multipart("/post/image")
-                .file(mockMultipartFile)
-                .contentType(MediaType.MULTIPART_FORM_DATA));
+        ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/recent")
+                .param("page", String.valueOf(page)));
 
-        // Then
-        ApiResponse<String> response = new ApiResponse<>(dummyURL);
+        ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>(postResponses);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
     @Test
-    @DisplayName("게시글 작성 테스트")
-    public void post() throws Exception {
-        // Given
-        PostSaveForm postSaveForm = getPostSaveForm();
-        PostResponse postResponse = getPostResponse(postSaveForm);
+    @DisplayName("해당 카테고리의 게시글 페이지네이션 테스트")
+    public void getPostsInCategory() throws Exception {
+        int categoryId = 1;
+        int page = 1;
 
-        when(postService.savePost(any(PostSaveDto.class))).thenReturn(postResponse);
+        List<PostResponse> postResponses = List.of(new PostResponse(1, "title", "content", "thumbUrl", 1, LocalDateTime.now(), LocalDateTime.now()));
 
-        // When
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/post")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(postSaveForm)));
+        when(postService.getPostsInCategory(any(int.class), any(PostPaginationCond.class))).thenReturn(postResponses);
 
-        // Then
-        ApiResponse<PostResponse> response = new ApiResponse<>(postResponse);
+        ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/category/" + categoryId)
+                .param("page", String.valueOf(page)));
+
+        ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>(postResponses);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
-    }
-
-    @Test
-    @DisplayName("게시글 수정 테스트")
-    public void updatePost() throws Exception {
-        // Given
-        PostUpdateForm postUpdateForm = getPostUpdateForm();
-
-        when(postService.updatePost(any(PostUpdateDto.class))).thenReturn(true);
-
-        // When
-        ResultActions resultActions = mockMvc.perform(patch("/post")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(postUpdateForm)));
-
-        // Then
-        ApiResponse<Boolean> response = new ApiResponse<>(true);
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
-    }
-
-    @Test
-    @DisplayName("게시글 삭제 테스트")
-    public void deletePost() throws Exception {
-        // Given
-        when(postService.deletePost(any(int.class))).thenReturn(true);
-
-        // When
-        ResultActions resultActions = mockMvc.perform(delete("/post/1")
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // Then
-        ApiResponse<Boolean> response = new ApiResponse<>(true);
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().json(toJson(response)));
-    }
-
-
-    private PostSaveForm getPostSaveForm() {
-        return new PostSaveForm("test", "test", 1);
-    }
-
-    private PostResponse getPostResponse(PostSaveForm postSaveForm) {
-        return new PostResponse(
-                1,
-                postSaveForm.getTitle(),
-                postSaveForm.getContent(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                postSaveForm.getCategoryId(),
-                0,
-                0);
-    }
-
-    private PostUpdateForm getPostUpdateForm() {
-        return new PostUpdateForm(1, "test", "test", 1);
+                .andExpect(content().json(toJson(apiResponse)));
     }
 
 }

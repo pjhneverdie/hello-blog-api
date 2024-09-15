@@ -8,12 +8,6 @@
         VALUES (#{email}, #{password})
     </insert>
 
-    <delete id="deleteMemberById">
-        DELETE
-        FROM member
-        WHERE id = #{id}
-    </delete>
-
     <select id="selectMemberByEmail" resultType="Member">
         SELECT id, email, password
         FROM member

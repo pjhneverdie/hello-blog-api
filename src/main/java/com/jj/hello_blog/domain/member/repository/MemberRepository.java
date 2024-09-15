@@ -1,10 +1,12 @@
 package com.jj.hello_blog.domain.member.repository;
 
-import com.jj.hello_blog.domain.member.dto.Member;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.jj.hello_blog.domain.member.dto.Member;
 
 @Repository
 @RequiredArgsConstructor
@@ -14,10 +16,6 @@ public class MemberRepository {
 
     public void insertMember(Member member) {
         memberMapper.insertMember(member);
-    }
-
-    public void deleteMemberById(int id) {
-        memberMapper.deleteMemberById(id);
     }
 
     public Optional<Member> selectMemberByEmail(String email) {
