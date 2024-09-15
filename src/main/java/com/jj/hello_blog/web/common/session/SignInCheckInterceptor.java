@@ -26,6 +26,11 @@ public class SignInCheckInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // CORS Preflight 요청은 통과
+        if (request.getMethod().equals("OPTIONS")) {
+            return true;
+        }
+
         HttpSession session = request.getSession(false);
 
         if (session != null && session.getAttribute(SessionConst.MEMBER_KEY) != null) {
