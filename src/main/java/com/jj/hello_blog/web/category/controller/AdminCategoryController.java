@@ -35,7 +35,7 @@ public class AdminCategoryController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<ApiResponse<CategoryResponse>> addCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @RequestPart CategoryAddForm categoryAddForm
+            @Valid  @RequestPart CategoryAddForm categoryAddForm
     ) {
         CategoryAddDto categoryAddDto = new CategoryAddDto(categoryAddForm.getName(), thumbImageFile, categoryAddForm.getParentId());
 
@@ -47,7 +47,7 @@ public class AdminCategoryController {
     @PatchMapping
     ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @RequestPart CategoryUpdateForm categoryUpdateForm
+            @Valid @RequestPart CategoryUpdateForm categoryUpdateForm
     ) {
         CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto(categoryUpdateForm.getId(), categoryUpdateForm.getName(), categoryUpdateForm.getThumbUrl(), thumbImageFile, categoryUpdateForm.getParentId());
 

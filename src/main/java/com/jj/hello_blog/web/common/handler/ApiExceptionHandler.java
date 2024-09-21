@@ -1,5 +1,7 @@
 package com.jj.hello_blog.web.common.handler;
 
+import jakarta.validation.ConstraintViolationException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
@@ -38,7 +40,7 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiResponse, GlobalExceptionCode.NOT_FOUND.httpStatus());
     }
 
-    @ExceptionHandler({HttpMessageConversionException.class, MethodArgumentNotValidException.class, HandlerMethodValidationException.class})
+    @ExceptionHandler({ConstraintViolationException.class, HttpMessageConversionException.class, MethodArgumentNotValidException.class, HandlerMethodValidationException.class})
     public ResponseEntity<ApiResponse<Void>> handleValidationException(Exception e) {
         ApiResponse<Void> apiResponse = createApiResponse();
 

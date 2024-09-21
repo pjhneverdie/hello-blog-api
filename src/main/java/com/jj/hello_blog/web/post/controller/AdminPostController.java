@@ -49,7 +49,7 @@ public class AdminPostController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResponse<PostResponse>> savePost(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @RequestPart PostSaveForm postSaveForm
+            @Valid @RequestPart PostSaveForm postSaveForm
     ) {
         int savedId = postService.savePost(new PostSaveDto(postSaveForm.getTitle(), postSaveForm.getContent(), thumbImageFile, postSaveForm.getCategoryId()));
 
@@ -59,7 +59,7 @@ public class AdminPostController {
     @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
             @Valid @FileTypeConstraint @RequestPart(required = false) MultipartFile thumbImageFile,
-            @RequestPart PostUpdateForm postUpdateForm
+            @Valid @RequestPart PostUpdateForm postUpdateForm
     ) {
         PostUpdateDto postUpdateDto = new PostUpdateDto(postUpdateForm.getId(), postUpdateForm.getTitle(), postUpdateForm.getContent(), postUpdateForm.getThumbUrl(), thumbImageFile, postUpdateForm.getCategoryId());
 
