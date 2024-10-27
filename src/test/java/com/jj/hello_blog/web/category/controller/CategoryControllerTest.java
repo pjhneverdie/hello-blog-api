@@ -43,8 +43,8 @@ class CategoryControllerTest extends ControllerTestBase {
     void getRootCategories() throws Exception {
         // Given
         List<CategoryResponse> categoryResponse = new ArrayList<>();
-        categoryResponse.add(new CategoryResponse(1, "root1", "test", null, LocalDateTime.now(), 0));
-        categoryResponse.add(new CategoryResponse(2, "root2", "test", null, LocalDateTime.now(), 0));
+        categoryResponse.add(new CategoryResponse(1, "root1", "test", null, LocalDateTime.now(), 0,0));
+        categoryResponse.add(new CategoryResponse(2, "root2", "test", null, LocalDateTime.now(), 0,0));
 
         when(categoryService.getRootCategories()).thenReturn(categoryResponse);
 
@@ -64,8 +64,8 @@ class CategoryControllerTest extends ControllerTestBase {
     void getSubCategories() throws Exception {
         // Given
         List<CategoryResponse> categoryResponse = new ArrayList<>();
-        categoryResponse.add(new CategoryResponse(3, "root1-child1", "test", 1, LocalDateTime.now(), 0));
-        categoryResponse.add(new CategoryResponse(4, "root1-child2", "test", 1, LocalDateTime.now(), 0));
+        categoryResponse.add(new CategoryResponse(3, "root1-child1", "test", 1, LocalDateTime.now(), 0,0));
+        categoryResponse.add(new CategoryResponse(4, "root1-child2", "test", 1, LocalDateTime.now(), 0,0));
 
         when(categoryService.getSubCategories(any(int.class))).thenReturn(categoryResponse);
 

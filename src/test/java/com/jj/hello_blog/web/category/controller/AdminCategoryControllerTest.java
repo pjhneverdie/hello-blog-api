@@ -58,7 +58,7 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         MockMultipartFile jsonFile = createMockFormFile(categoryAddForm, "categoryAddForm");
         MockMultipartFile thumbImageFile = createMockImageFile("thumbImageFile", "jpeg");
 
-        CategoryResponse categoryResponse = new CategoryResponse(1, categoryAddForm.getName(), thumbImageFile.getName(), null, LocalDateTime.now(), 0);
+        CategoryResponse categoryResponse = new CategoryResponse(1, categoryAddForm.getName(), thumbImageFile.getName(), null, LocalDateTime.now(), 0, 0);
 
         when(categoryService.addCategory(any(CategoryAddDto.class))).thenReturn(1);
         when(categoryService.getCategoryAndPostCount(any(int.class))).thenReturn(categoryResponse);
@@ -116,7 +116,7 @@ class AdminCategoryControllerTest extends ControllerTestBase {
         MockMultipartFile jsonFile = createMockFormFile(categoryUpdateForm, "categoryUpdateForm");
         MockMultipartFile thumbImageFile = createMockImageFile("thumbImageFile", "jpeg");
 
-        CategoryResponse categoryResponse = new CategoryResponse(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile.getName(), categoryUpdateForm.getParentId(), LocalDateTime.now(), 0);
+        CategoryResponse categoryResponse = new CategoryResponse(categoryUpdateForm.getId(), categoryUpdateForm.getName(), thumbImageFile.getName(), categoryUpdateForm.getParentId(), LocalDateTime.now(), 0, 0);
 
         doNothing().when(categoryService).updateCategory(any(CategoryUpdateDto.class));
 

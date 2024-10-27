@@ -23,4 +23,6 @@ public class CategoryResponse {
 
     private int postCount;
 
+    private Integer childCategoryCount;
+
 }

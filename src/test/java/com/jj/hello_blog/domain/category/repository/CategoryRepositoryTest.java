@@ -115,13 +115,13 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    @DisplayName("카테고리랑 그 카테고리에 게시된 글의 개수 조회 테스트")
+    @DisplayName("카테고리랑 그 카테고리에 게시된 글의 개수 + 하위 카테고리의 개수 조회 테스트")
     void selectCategoryAndPostCountJoinPostById() {
         // Given
         Category category = createCategory(null, "test", "test", null, null);
         categoryRepository.insertCategory(category);
 
-        CategoryResponse expectedResponse = new CategoryResponse(category.getId(), category.getName(), category.getThumbUrl(), category.getParentId(), category.getCreatedAt(), 0);
+        CategoryResponse expectedResponse = new CategoryResponse(category.getId(), category.getName(), category.getThumbUrl(), category.getParentId(), category.getCreatedAt(), 0, 0);
 
         // When
         CategoryResponse categoryResponse = categoryRepository.selectCategoryAndPostCountJoinPostById(category.getId());
@@ -145,8 +145,8 @@ public class CategoryRepositoryTest {
         categoryRepository.insertCategory(parent2);
 
         CategoryResponse[] expectedResponse = {
-                new CategoryResponse(parent1.getId(), parent1.getName(), parent1.getThumbUrl(), parent1.getParentId(), parent1.getCreatedAt(), 0),
-                new CategoryResponse(parent2.getId(), parent2.getName(), parent2.getThumbUrl(), parent2.getParentId(), parent2.getCreatedAt(), 0)
+                new CategoryResponse(parent1.getId(), parent1.getName(), parent1.getThumbUrl(), parent1.getParentId(), parent1.getCreatedAt(), 0, 0),
+                new CategoryResponse(parent2.getId(), parent2.getName(), parent2.getThumbUrl(), parent2.getParentId(), parent2.getCreatedAt(), 0, 0)
         };
 
         // When
@@ -173,8 +173,8 @@ public class CategoryRepositoryTest {
         categoryRepository.insertCategory(child);
 
         CategoryResponse[] expectedResponse = {
-                new CategoryResponse(parent.getId(), parent.getName(), parent.getThumbUrl(), parent.getParentId(), parent.getCreatedAt(), 0),
-                new CategoryResponse(child.getId(), child.getName(), child.getThumbUrl(), child.getParentId(), child.getCreatedAt(), 0),
+                new CategoryResponse(parent.getId(), parent.getName(), parent.getThumbUrl(), parent.getParentId(), parent.getCreatedAt(), 0, 0),
+                new CategoryResponse(child.getId(), child.getName(), child.getThumbUrl(), child.getParentId(), child.getCreatedAt(), 0, 0),
         };
 
         // When

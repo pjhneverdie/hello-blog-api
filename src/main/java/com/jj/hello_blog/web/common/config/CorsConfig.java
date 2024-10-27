@@ -16,6 +16,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Value("${cors.allowedMethods}")
     private String[] allowedMethods;
 
+    @Value("${cors.allowedHeaders}")
+    private String[] allowedHeaders;
+
     @Value("${cors.allowCredentials}")
     private boolean allowCredentials;
 
@@ -24,7 +27,7 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods(allowedMethods)
-                .allowedHeaders("*")
+                .allowedHeaders(allowedHeaders)
                 .allowCredentials(allowCredentials);
     }
 
